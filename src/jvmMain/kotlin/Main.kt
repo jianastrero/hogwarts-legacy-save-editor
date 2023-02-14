@@ -41,6 +41,6 @@ fun main() = application {
 }
 
 fun ApplicationScope.myExitApplication() {
-    HLSESQLite.getInstance()?.close()
+    HLSESQLite.close()
     exitApplication()
 }

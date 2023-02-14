@@ -11,7 +11,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
@@ -21,17 +23,20 @@ fun HLSEButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    full: Boolean = true,
+    tint: Color? = null
 ) {
-    val buttonPainter = painterResource("button.svg")
+    val buttonPainter = painterResource(if (full) "button.svg" else "button-half.svg")
     Box(
         modifier = Modifier
-            .size(364.dp, 50.dp)
+            .size(if (full) 360.dp else 168.dp, 50.dp)
             .then(modifier)
     ) {
         Image(
             painter = buttonPainter,
             contentDescription = null,
+            colorFilter = tint?.let { ColorFilter.tint(it, BlendMode.Modulate) },
             modifier = Modifier.fillMaxWidth()
         )
         Text(

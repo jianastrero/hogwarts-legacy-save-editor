@@ -91,7 +91,13 @@ fun App(
 
                     composable(route = HLSENav.MainScreen) {
                         hlSaveFileData?.let {
-                            MainScreen(modifier = Modifier.fillMaxSize())
+                            MainScreen(
+                                onBack = {
+                                    HLSESQLite.close()
+                                    navController.navigate(HLSENav.InitialScreen)
+                                },
+                                modifier = Modifier.fillMaxSize()
+                            )
                         } ?: kotlin.run {
                             navController.navigate(HLSENav.InitialScreen)
                             // TODO: Show error, file is not readable

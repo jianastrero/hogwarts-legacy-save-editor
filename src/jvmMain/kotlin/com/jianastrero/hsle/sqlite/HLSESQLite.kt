@@ -28,7 +28,7 @@ class HLSESQLite private constructor(sqliteFilePath: String) {
         return newFields
     }
 
-    fun close() {
+    private fun close() {
         connection.close()
     }
 
@@ -41,5 +41,10 @@ class HLSESQLite private constructor(sqliteFilePath: String) {
         }
 
         fun getInstance(): HLSESQLite? = instance
+
+        fun close() {
+            instance?.close()
+            instance = null
+        }
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +31,7 @@ import java.net.URI
 
 @Composable
 fun MainScreen(
+    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -49,29 +51,56 @@ fun MainScreen(
                     HLSEButton(
                         text = it.title,
                         onClick = {
-
+                            navController.navigate(it)
                         },
                         modifier = Modifier
                     )
                 }
             }
-            Button(
-                onClick = {
-                    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                        Desktop.getDesktop().browse(URI("https://www.buymeacoffee.com/jianastrero"))
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(backgroundColor = Yellow, contentColor = Color.Black),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.padding(12.dp)
-                    .width(140.dp)
-                    .align(Alignment.Start)
-            ) {
-                Image(
-                    painter = bmcPainter,
-                    contentDescription = "Buy me a coffee",
-                    modifier = Modifier.fillMaxWidth()
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                HLSEButton(
+                    text = "Backup",
+                    onClick = {},
+                    full = false,
+                    tint = Color.Blue
                 )
+                Spacer(modifier = Modifier.width(12.dp))
+                HLSEButton(
+                    text = "Save",
+                    onClick = {},
+                    full = false,
+                    tint = Yellow
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 12.dp)
+            ) {
+                HLSEButton(
+                    text = "Close",
+                    onClick = {
+                        onBack()
+                    },
+                    full = false,
+                    tint = Color.Red
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Button(
+                    onClick = {
+                        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                            Desktop.getDesktop().browse(URI("https://www.buymeacoffee.com/jianastrero"))
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Yellow, contentColor = Color.Black),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.width(168.dp)
+                ) {
+                    Image(
+                        painter = bmcPainter,
+                        contentDescription = "Buy me a coffee",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
         NavHost(
