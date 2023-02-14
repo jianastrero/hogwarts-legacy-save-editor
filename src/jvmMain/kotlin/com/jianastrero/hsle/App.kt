@@ -20,7 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.jianastrero.hsle.component.NavHost
-import com.jianastrero.hsle.component.builder.rememberNavController
+import com.jianastrero.hsle.model.rememberNavController
 import com.jianastrero.hsle.screen.InitialScreen
 import com.jianastrero.hsle.screen.MainScreen
 import com.jianastrero.hsle.typography.NotoSerifTypography
