@@ -27,6 +27,7 @@ import com.jianastrero.hsle.component.NavHost
 import com.jianastrero.hsle.model.HLSaveFileData
 import com.jianastrero.hsle.model.rememberNavController
 import com.jianastrero.hsle.nav.HLSENav
+import com.jianastrero.hsle.save_file.HLSaveFile
 import com.jianastrero.hsle.screen.InitialScreen
 import com.jianastrero.hsle.screen.MainScreen
 import com.jianastrero.hsle.sqlite.HLSESQLite
@@ -42,6 +43,7 @@ fun App(
     val titlePainter = painterResource("title.png")
     val closePainter = painterResource("close_button.png")
     val navController = rememberNavController()
+    var originalFilePath: String? by remember { mutableStateOf(null) }
     var hlSaveFileData: HLSaveFileData? by remember { mutableStateOf(null) }
 
     MaterialTheme(typography = NotoSerifTypography) {
@@ -80,9 +82,10 @@ fun App(
                     composable(route = HLSENav.InitialScreen) {
                         InitialScreen(
                             onSelectLoadFile = onSelectLoadFile,
-                            onValidSaveFileSelected = {
-                                HLSESQLite.initiate(it.tempSqliteFilePath)
-                                hlSaveFileData = it
+                            onValidSaveFileSelected = { _originalFilePath, _hlSaveFileData ->
+                                HLSESQLite.initiate(_hlSaveFileData.tempSqliteFilePath)
+                                originalFilePath = _originalFilePath
+                                hlSaveFileData = _hlSaveFileData
                                 navController.navigate(HLSENav.MainScreen)
                             },
                             modifier = Modifier.fillMaxSize()
@@ -93,8 +96,13 @@ fun App(
                         hlSaveFileData?.let {
                             MainScreen(
                                 onBack = {
+                                    originalFilePath = null
+                                    hlSaveFileData = null
                                     HLSESQLite.close()
                                     navController.navigate(HLSENav.InitialScreen)
+                                },
+                                onBackup = {
+                                    originalFilePath?.let(HLSaveFile::backup)
                                 },
                                 modifier = Modifier.fillMaxSize()
                             )

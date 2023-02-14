@@ -14,7 +14,7 @@ import java.io.File
 @Preview
 fun InitialScreen(
     onSelectLoadFile: (directory: String) -> String?,
-    onValidSaveFileSelected: (hlSaveFileData: HLSaveFileData) -> Unit,
+    onValidSaveFileSelected: (originalFilePath: String, hlSaveFileData: HLSaveFileData) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -24,11 +24,13 @@ fun InitialScreen(
                 val appDataDirFile = File(System.getenv("APPDATA")).parentFile
                 val saveDirectoryFile = File(appDataDirFile, "\\Local\\Hogwarts Legacy\\Saved\\SaveGames")
                 val saveDirectoryMainFile = saveDirectoryFile.listFiles()?.filter { it.isDirectory }?.firstOrNull()
-                val selectedFile = onSelectLoadFile(saveDirectoryMainFile?.absolutePath ?: saveDirectoryFile.absolutePath)
+                val selectedFilePath = onSelectLoadFile(
+                    saveDirectoryMainFile?.absolutePath ?: saveDirectoryFile.absolutePath
+                )
                     ?: return@OnClick
                 try {
-                    val hlSaveFileData = HLSaveFile.read(selectedFile)
-                    onValidSaveFileSelected(hlSaveFileData)
+                    val hlSaveFileData = HLSaveFile.read(selectedFilePath)
+                    onValidSaveFileSelected(selectedFilePath, hlSaveFileData)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     // TODO: Show file invalid error message

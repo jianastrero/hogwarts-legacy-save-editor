@@ -32,6 +32,7 @@ import java.net.URI
 @Composable
 fun MainScreen(
     onBack: () -> Unit,
+    onBackup: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -60,7 +61,7 @@ fun MainScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 HLSEButton(
                     text = "Backup",
-                    onClick = {},
+                    onClick = onBackup,
                     full = false,
                     tint = Color.Blue
                 )
@@ -78,9 +79,7 @@ fun MainScreen(
             ) {
                 HLSEButton(
                     text = "Close",
-                    onClick = {
-                        onBack()
-                    },
+                    onClick = onBack,
                     full = false,
                     tint = Color.Red
                 )
