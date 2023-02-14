@@ -4,8 +4,20 @@ import com.jianastrero.hsle.extensions.findFirst
 import com.jianastrero.hsle.extensions.littleEndian
 import com.jianastrero.hsle.model.HLSaveFileData
 import java.io.File
+import java.nio.file.Files
+import java.text.SimpleDateFormat
+import java.util.*
 
-class HLSaveFile {
+object HLSaveFile {
+
+    private val RAW_DB_IMAGE_BYTES = byteArrayOf(
+        0x52, 0x61, 0x77, 0x44,
+        0x61, 0x74, 0x61, 0x62,
+        0x61, 0x73, 0x65, 0x49,
+        0x6D, 0x61, 0x67, 0x65
+    )
+    private const val TEMP_FOLDER = "temp"
+    private const val BACKUP_FOLDER = "backup"
 
     fun read(filePath: String): HLSaveFileData {
         val bytes = File(filePath).readBytes()
@@ -18,7 +30,7 @@ class HLSaveFile {
         val dbEndOffset = dbStartOffset + dbSize
 
         generateTempFolder()
-        val tempSqliteFilePath = "${TEMP_FOLDER}${File.separatorChar}temp-${System.currentTimeMillis()}.sqlite"
+        val tempSqliteFilePath = "$TEMP_FOLDER${File.separatorChar}temp-${System.currentTimeMillis()}.sqlite"
         val tempSqliteFile = File(tempSqliteFilePath)
         tempSqliteFile.outputStream().use {
             it.write(bytes.copyOfRange(dbStartOffset, dbEndOffset))
@@ -63,25 +75,35 @@ class HLSaveFile {
         }
     }
 
-    companion object {
-        private val RAW_DB_IMAGE_BYTES = byteArrayOf(
-            0x52, 0x61, 0x77, 0x44,
-            0x61, 0x74, 0x61, 0x62,
-            0x61, 0x73, 0x65, 0x49,
-            0x6D, 0x61, 0x67, 0x65
-        )
-        private const val TEMP_FOLDER = "temp"
+    fun backup(originalSavePath: String) {
+        generateBackupFolder()
 
-        private fun generateTempFolder() {
-            try {
-                val tempFolder = File(TEMP_FOLDER)
-                tempFolder.mkdirs()
-                tempFolder.listFiles()?.forEach {
-                    it.deleteRecursively()
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+        val originalFile = File(originalSavePath)
+        val fileName = originalFile.nameWithoutExtension
+        val extension = originalFile.extension
+        val calendar = Calendar.getInstance()
+        val sdf = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSSS", Locale.US)
+        Files.copy(originalFile.toPath(), File("$BACKUP_FOLDER/$fileName.bak-${sdf.format(calendar.time)}.$extension").toPath())
+    }
+
+    private fun generateTempFolder() {
+        try {
+            val tempFolder = File(TEMP_FOLDER)
+            tempFolder.mkdirs()
+            tempFolder.listFiles()?.forEach {
+                it.deleteRecursively()
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun generateBackupFolder() {
+        try {
+            val tempFolder = File(BACKUP_FOLDER)
+            tempFolder.mkdirs()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }
