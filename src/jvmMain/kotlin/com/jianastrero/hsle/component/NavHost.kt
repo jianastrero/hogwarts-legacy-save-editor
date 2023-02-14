@@ -14,7 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.jianastrero.hsle.HLSENav
+import com.jianastrero.hsle.nav.HLSENav
 import com.jianastrero.hsle.model.NavController
 import com.jianastrero.hsle.model.rememberNavController
 

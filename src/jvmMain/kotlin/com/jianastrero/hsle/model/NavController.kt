@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.jianastrero.hsle.HLSENav
+import com.jianastrero.hsle.nav.HLSENav
 
 class NavController {
     private var onNavigate: (HLSENav) -> Unit = {}

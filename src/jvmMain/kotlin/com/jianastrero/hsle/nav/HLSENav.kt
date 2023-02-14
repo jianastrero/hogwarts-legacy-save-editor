@@ -1,4 +1,4 @@
-package com.jianastrero.hsle
+package com.jianastrero.hsle.nav
 
 enum class HLSENav {
     InitialScreen,

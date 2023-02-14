@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.jianastrero.hsle.component.NavHost
 import com.jianastrero.hsle.model.HLSaveFileData
 import com.jianastrero.hsle.model.rememberNavController
+import com.jianastrero.hsle.nav.HLSENav
 import com.jianastrero.hsle.screen.InitialScreen
 import com.jianastrero.hsle.screen.MainScreen
 import com.jianastrero.hsle.theme.NotoSerifTypography
