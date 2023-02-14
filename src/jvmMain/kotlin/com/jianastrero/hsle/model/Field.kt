@@ -18,13 +18,13 @@ sealed class Field<T>(
         return "UPDATE $table SET $valueColumn = \"$value\" WHERE $whereClause"
     }
 
-    fun <T> copy(value: T): Field<T> = when (this) {
-        is PersonalDataField.FirstName -> PersonalDataField.FirstName(value = value as String)
-        is PersonalDataField.LastName -> PersonalDataField.LastName(value = value as String)
-        is PersonalDataField.Experience -> PersonalDataField.Experience(value = value as Int)
-        is PersonalDataField.Galleons -> PersonalDataField.Galleons(value = value as Int)
-        is PersonalDataField.TalentPoints -> PersonalDataField.TalentPoints(value = value as Int)
-        is ResourcesField -> copy(value = value)
+    fun <T> copy(newValue: T): Field<T> = when (this) {
+        is PersonalDataField.FirstName -> PersonalDataField.FirstName(value = newValue as String)
+        is PersonalDataField.LastName -> PersonalDataField.LastName(value = newValue as String)
+        is PersonalDataField.Experience -> PersonalDataField.Experience(value = newValue as Int)
+        is PersonalDataField.Galleons -> PersonalDataField.Galleons(value = newValue as Int)
+        is PersonalDataField.TalentPoints -> PersonalDataField.TalentPoints(value = newValue as Int)
+        is ResourcesField -> copy(value = newValue as Int)
     } as Field<T>
 
     sealed class PersonalDataField<T>(

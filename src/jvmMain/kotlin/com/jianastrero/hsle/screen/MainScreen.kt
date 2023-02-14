@@ -120,6 +120,17 @@ fun MainScreen(
                         )
                 )
             }
+            composable(HLSENav.Main.Resources) {
+                ResourcesScreen(
+                    modifier = Modifier.fillMaxSize()
+                        .padding(
+                            start = 12.dp,
+                            top = 12.dp,
+                            bottom = 12.dp,
+                            end = 24.dp
+                        )
+                )
+            }
         }
     }
 }
