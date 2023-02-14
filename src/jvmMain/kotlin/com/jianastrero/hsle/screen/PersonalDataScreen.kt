@@ -23,11 +23,11 @@ fun PersonalDataScreen(
         mutableStateOf(
             FieldViewModel(
                 list = listOf(
-                    Field.FirstName(""),
-                    Field.LastName(""),
-                    Field.Experience(0),
-                    Field.Galleons(0),
-                    Field.TalentPoints(0)
+                    Field.PersonalDataField.FirstName(""),
+                    Field.PersonalDataField.LastName(""),
+                    Field.PersonalDataField.Experience(0),
+                    Field.PersonalDataField.Galleons(0),
+                    Field.PersonalDataField.TalentPoints(0)
                 )
             )
         )

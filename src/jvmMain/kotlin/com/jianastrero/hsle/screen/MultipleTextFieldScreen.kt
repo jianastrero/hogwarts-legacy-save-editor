@@ -78,7 +78,7 @@ fun <T> TextFieldFieldItem(
 @Preview
 private fun TextFieldFieldItemPreview() {
     TextFieldFieldItem(
-        item = Field.FirstName("Jian"),
+        item = Field.PersonalDataField.FirstName("Jian"),
         onUpdate = {},
         onUpdatesqlite = {},
         modifier = Modifier.fillMaxWidth()
