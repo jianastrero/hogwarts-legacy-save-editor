@@ -14,30 +14,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.jianastrero.hsle.component.NavHost
+import com.jianastrero.hsle.model.HLSaveFileData
 import com.jianastrero.hsle.model.rememberNavController
 import com.jianastrero.hsle.screen.InitialScreen
 import com.jianastrero.hsle.screen.MainScreen
-import com.jianastrero.hsle.typography.NotoSerifTypography
+import com.jianastrero.hsle.theme.NotoSerifTypography
 
 @Composable
 @Preview
 fun App(
+    onSelectLoadFile: (directory: String) -> String?,
     onClose: () -> Unit
 ) {
     val backgroundPainter = painterResource("background.png")
     val titlePainter = painterResource("title.png")
     val closePainter = painterResource("close_button.png")
     val navController = rememberNavController()
+    var hlSaveFileData: HLSaveFileData? by remember { mutableStateOf(null) }
 
-    MaterialTheme(
-        typography = NotoSerifTypography
-    ) {
+    MaterialTheme(typography = NotoSerifTypography) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = backgroundPainter,
@@ -71,7 +76,14 @@ fun App(
                     modifier = Modifier.fillMaxWidth().weight(1f)
                 ) {
                     composable(route = HSLENav.InitialScreen) {
-                        InitialScreen(modifier = Modifier.fillMaxSize())
+                        InitialScreen(
+                            onSelectLoadFile = onSelectLoadFile,
+                            onValidSaveFileSelected = {
+                                hlSaveFileData = it
+                                navController.navigate(HSLENav.MainScreen)
+                            },
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
 
                     composable(route = HSLENav.MainScreen) {

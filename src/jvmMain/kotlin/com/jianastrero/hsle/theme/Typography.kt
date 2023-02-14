@@ -1,4 +1,4 @@
-package com.jianastrero.hsle.typography
+package com.jianastrero.hsle.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.font.FontFamily
