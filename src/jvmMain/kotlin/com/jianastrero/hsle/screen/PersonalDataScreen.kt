@@ -33,6 +33,7 @@ fun PersonalDataScreen(
         )
     }
     val defaultScope = rememberCoroutineScope { Dispatchers.Default }
+    val ioScope = rememberCoroutineScope { Dispatchers.IO }
 
     LoadablePage(state = viewModel.state.loadablePageState) {
         MultipleTextFieldScreen(
@@ -40,6 +41,11 @@ fun PersonalDataScreen(
             onUpdateField = {
                 defaultScope.launch {
                     viewModel.updateField(it)
+                }
+            },
+            onUpdateFieldSqlite = {
+                ioScope.launch {
+                    viewModel.updateFieldSqlite(it)
                 }
             },
             modifier = modifier

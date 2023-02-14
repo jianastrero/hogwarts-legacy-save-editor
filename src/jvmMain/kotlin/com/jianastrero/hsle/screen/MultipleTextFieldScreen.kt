@@ -10,6 +10,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.jianastrero.hsle.extensions.getGenericValue
@@ -21,6 +22,7 @@ import com.jianastrero.hsle.theme.Yellow
 fun <T> MultipleTextFieldScreen(
     fields: List<Field<out T>>,
     onUpdateField: (Field<out T>) -> Unit,
+    onUpdateFieldSqlite: (Field<out T>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -31,6 +33,9 @@ fun <T> MultipleTextFieldScreen(
             TextFieldFieldItem(
                 it,
                 onUpdate = onUpdateField,
+                onUpdatesqlite = {
+                    onUpdateFieldSqlite(it)
+                },
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -41,6 +46,7 @@ fun <T> MultipleTextFieldScreen(
 fun <T> TextFieldFieldItem(
     item: Field<out T>,
     onUpdate: (Field<out T>) -> Unit,
+    onUpdatesqlite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TextField(
@@ -60,7 +66,11 @@ fun <T> TextFieldFieldItem(
             focusedIndicatorColor = Yellow,
             unfocusedIndicatorColor = Yellow.copy(alpha = 0.3f)
         ),
-        modifier = modifier
+        modifier = Modifier
+            .onFocusChanged {
+                onUpdatesqlite()
+            }
+            .then(modifier)
     )
 }
 
@@ -70,6 +80,7 @@ private fun TextFieldFieldItemPreview() {
     TextFieldFieldItem(
         item = Field.FirstName("Jian"),
         onUpdate = {},
+        onUpdatesqlite = {},
         modifier = Modifier.fillMaxWidth()
     )
 }

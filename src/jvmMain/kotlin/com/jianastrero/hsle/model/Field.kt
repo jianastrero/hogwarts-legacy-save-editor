@@ -13,6 +13,11 @@ sealed class Field<T>(
         return "SELECT $valueColumn FROM $table WHERE $whereClause"
     }
 
+    fun updateQuery(): String {
+        val whereClause = identifiers.joinToString(" AND ") { (column, value) -> "$column = \"$value\"" }
+        return "UPDATE $table SET $valueColumn = \"$value\" WHERE $whereClause"
+    }
+
     fun <T> copy(value: T): Field<T> = when (this) {
         is FirstName -> FirstName(value = value as String)
         is LastName -> LastName(value = value as String)

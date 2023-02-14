@@ -45,6 +45,7 @@ class FieldViewModel<T>(list: List<Field<out T>>) {
     }
 
     suspend fun updateField(field: Field<out T>) = withContext(Dispatchers.Default) {
+        field.updateQuery()
         val newFields = state.fields.map {
             if (it.title == field.title) {
                 field
@@ -53,5 +54,9 @@ class FieldViewModel<T>(list: List<Field<out T>>) {
             }
         }
         updateState(fields = newFields)
+    }
+
+    suspend fun updateFieldSqlite(field: Field<out T>) = withContext(Dispatchers.IO) {
+        HLSESQLite.getInstance()?.updateField(field)
     }
 }

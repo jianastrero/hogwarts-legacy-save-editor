@@ -2,11 +2,13 @@ package com.jianastrero.hsle.sqlite
 
 import com.jianastrero.hsle.model.Field
 import java.sql.DriverManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class HLSESQLite private constructor(sqliteFilePath: String) {
     private val connection = DriverManager.getConnection("jdbc:sqlite:${sqliteFilePath}")
 
-    fun <T> fetchAll(fields: List<Field<out T>>): List<Field<T>> {
+    suspend fun <T> fetchAll(fields: List<Field<out T>>): List<Field<T>> = withContext(Dispatchers.IO) {
         val newFields = mutableListOf<Field<T>>()
 
         fields.forEach {
@@ -25,7 +27,12 @@ class HLSESQLite private constructor(sqliteFilePath: String) {
             }
         }
 
-        return newFields
+        newFields
+    }
+
+    suspend fun <T> updateField(field: Field<out T>): Boolean = withContext(Dispatchers.IO) {
+        val statement = connection.createStatement()
+        statement.executeUpdate(field.updateQuery()) > 0
     }
 
     private fun close() {
