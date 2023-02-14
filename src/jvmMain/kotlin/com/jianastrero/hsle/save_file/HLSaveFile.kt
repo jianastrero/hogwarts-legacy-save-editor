@@ -75,7 +75,7 @@ object HLSaveFile {
         }
     }
 
-    fun backup(originalSavePath: String) {
+    fun backup(originalSavePath: String): String {
         generateBackupFolder()
 
         val originalFile = File(originalSavePath)
@@ -83,7 +83,10 @@ object HLSaveFile {
         val extension = originalFile.extension
         val calendar = Calendar.getInstance()
         val sdf = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSSS", Locale.US)
-        Files.copy(originalFile.toPath(), File("$BACKUP_FOLDER/$fileName.bak-${sdf.format(calendar.time)}.$extension").toPath())
+        val backupFilePath = "$BACKUP_FOLDER/$fileName.bak-${sdf.format(calendar.time)}.$extension"
+        Files.copy(originalFile.toPath(), File(backupFilePath).toPath())
+
+        return backupFilePath
     }
 
     private fun generateTempFolder() {
