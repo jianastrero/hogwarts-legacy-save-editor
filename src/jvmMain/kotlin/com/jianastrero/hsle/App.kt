@@ -19,7 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.jianastrero.hsle.component.NavHost
+import com.jianastrero.hsle.component.builder.rememberNavController
 import com.jianastrero.hsle.screen.InitialScreen
+import com.jianastrero.hsle.screen.MainScreen
 import com.jianastrero.hsle.typography.NotoSerifTypography
 
 @Composable
@@ -30,6 +33,7 @@ fun App(
     val backgroundPainter = painterResource("background.png")
     val titlePainter = painterResource("title.png")
     val closePainter = painterResource("close_button.png")
+    val navController = rememberNavController()
 
     MaterialTheme(
         typography = NotoSerifTypography
@@ -61,7 +65,19 @@ fun App(
                             .clickable(onClick = onClose)
                     )
                 }
-                InitialScreen(modifier = Modifier.fillMaxWidth().weight(1f))
+                NavHost(
+                    startDestination = HSLENav.InitialScreen,
+                    navController = navController,
+                    modifier = Modifier.fillMaxWidth().weight(1f)
+                ) {
+                    composable(route = HSLENav.InitialScreen) {
+                        InitialScreen(modifier = Modifier.fillMaxSize())
+                    }
+
+                    composable(route = HSLENav.MainScreen) {
+                        MainScreen(modifier = Modifier.fillMaxSize())
+                    }
+                }
             }
         }
     }
