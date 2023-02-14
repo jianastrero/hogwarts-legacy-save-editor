@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import com.jianastrero.hsle.component.HLSEButton
 import com.jianastrero.hsle.model.HLSaveFileData
 import com.jianastrero.hsle.save_file.HLSaveFile
+import java.io.File
 
 @Composable
 @Preview
@@ -20,7 +21,10 @@ fun InitialScreen(
         HLSEButton(
             text = "Select Save Game File",
             onClick = OnClick@{
-                val selectedFile = onSelectLoadFile("%APPDATA%\\..\\Local\\Hogwarts Legacy\\Saved\\SaveGames")
+                val appDataDirFile = File(System.getenv("APPDATA")).parentFile
+                val saveDirectoryFile = File(appDataDirFile, "\\Local\\Hogwarts Legacy\\Saved\\SaveGames")
+                val saveDirectoryMainFile = saveDirectoryFile.listFiles()?.filter { it.isDirectory }?.firstOrNull()
+                val selectedFile = onSelectLoadFile(saveDirectoryMainFile?.absolutePath ?: saveDirectoryFile.absolutePath)
                     ?: return@OnClick
                 try {
                     val hlSaveFileData = HLSaveFile.read(selectedFile)

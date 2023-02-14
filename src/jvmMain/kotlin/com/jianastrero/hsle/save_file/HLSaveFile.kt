@@ -38,7 +38,7 @@ object HLSaveFile {
         }
 
         return HLSaveFileData(
-            tempSqliteFilePath = tempSqliteFilePath,
+            tempSqliteFilePath = tempSqliteFile.absolutePath,
             saveFileBytes = bytes,
             rawDbImageStartIndex = rawDbImageStartIndex,
             dbEndOffset = dbEndOffset

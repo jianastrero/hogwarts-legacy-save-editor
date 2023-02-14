@@ -29,6 +29,7 @@ import com.jianastrero.hsle.model.rememberNavController
 import com.jianastrero.hsle.nav.HLSENav
 import com.jianastrero.hsle.screen.InitialScreen
 import com.jianastrero.hsle.screen.MainScreen
+import com.jianastrero.hsle.sqlite.HLSESQLite
 import com.jianastrero.hsle.theme.NotoSerifTypography
 
 @Composable
@@ -80,6 +81,7 @@ fun App(
                         InitialScreen(
                             onSelectLoadFile = onSelectLoadFile,
                             onValidSaveFileSelected = {
+                                HLSESQLite.initiate(it.tempSqliteFilePath)
                                 hlSaveFileData = it
                                 navController.navigate(HLSENav.MainScreen)
                             },
@@ -89,10 +91,7 @@ fun App(
 
                     composable(route = HLSENav.MainScreen) {
                         hlSaveFileData?.let {
-                            MainScreen(
-                                it,
-                                modifier = Modifier.fillMaxSize()
-                            )
+                            MainScreen(modifier = Modifier.fillMaxSize())
                         } ?: kotlin.run {
                             navController.navigate(HLSENav.InitialScreen)
                             // TODO: Show error, file is not readable

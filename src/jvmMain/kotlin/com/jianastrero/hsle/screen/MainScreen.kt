@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -21,7 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.jianastrero.hsle.component.HLSEButton
 import com.jianastrero.hsle.component.NavHost
-import com.jianastrero.hsle.model.HLSaveFileData
 import com.jianastrero.hsle.model.rememberNavController
 import com.jianastrero.hsle.nav.HLSENav
 import com.jianastrero.hsle.theme.Yellow
@@ -30,7 +30,6 @@ import java.net.URI
 
 @Composable
 fun MainScreen(
-    hlSaveFileData: HLSaveFileData,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -81,7 +80,17 @@ fun MainScreen(
             modifier = Modifier.weight(1f)
                 .fillMaxHeight()
         ) {
-
+            composable(HLSENav.Main.PlayerData) {
+                PersonalDataScreen(
+                    modifier = Modifier.fillMaxSize()
+                        .padding(
+                            start = 12.dp,
+                            top = 12.dp,
+                            bottom = 12.dp,
+                            end = 24.dp
+                        )
+                )
+            }
         }
     }
 }
