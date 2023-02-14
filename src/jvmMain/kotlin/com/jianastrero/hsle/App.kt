@@ -4,7 +4,7 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.jianastrero.hsle.screen.InitialScreen
+import com.jianastrero.hsle.typography.NotoSerifTypography
 
 @Composable
 @Preview
@@ -29,33 +31,37 @@ fun App(
     val titlePainter = painterResource("title.png")
     val closePainter = painterResource("close_button.png")
 
-    MaterialTheme {
+    MaterialTheme(
+        typography = NotoSerifTypography
+    ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = backgroundPainter,
                 contentDescription = "Background",
                 modifier = Modifier.fillMaxSize()
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-                    .height(IntrinsicSize.Max)
-                    .align(Alignment.TopCenter)
-                    .padding(12.dp)
-            ) {
-                Image(
-                    painter = titlePainter,
-                    contentDescription = "Hogwarts Legacy Save Editor",
-                    modifier = Modifier.padding(bottom = 12.dp, start = 12.dp)
-                )
-                Spacer(modifier = Modifier.weight(1f).height(1.dp))
-                Image(
-                    painter = closePainter,
-                    contentDescription = "Close",
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .clickable(onClick = onClose)
-                )
+            Column(modifier = Modifier.fillMaxSize()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                        .height(64.dp)
+                        .padding(12.dp)
+                ) {
+                    Image(
+                        painter = titlePainter,
+                        contentDescription = "Hogwarts Legacy Save Editor",
+                        modifier = Modifier.padding(bottom = 12.dp, start = 12.dp)
+                    )
+                    Spacer(modifier = Modifier.weight(1f).height(1.dp))
+                    Image(
+                        painter = closePainter,
+                        contentDescription = "Close",
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .clickable(onClick = onClose)
+                    )
+                }
+                InitialScreen(modifier = Modifier.fillMaxWidth().weight(1f))
             }
         }
     }
