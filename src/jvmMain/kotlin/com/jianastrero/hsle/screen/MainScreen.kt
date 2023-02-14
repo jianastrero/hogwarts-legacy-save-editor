@@ -33,6 +33,7 @@ import java.net.URI
 fun MainScreen(
     onBack: () -> Unit,
     onBackup: () -> Unit,
+    onSave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -68,7 +69,7 @@ fun MainScreen(
                 Spacer(modifier = Modifier.width(12.dp))
                 HLSEButton(
                     text = "Save",
-                    onClick = {},
+                    onClick = onSave,
                     full = false,
                     tint = Yellow
                 )

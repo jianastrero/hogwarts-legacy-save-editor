@@ -36,7 +36,8 @@ import com.jianastrero.hsle.theme.NotoSerifTypography
 @Composable
 @Preview
 fun App(
-    onSelectLoadFile: (directory: String) -> String?,
+    onSelectLoadFilePath: (directory: String) -> String?,
+    onSelectSaveFilePath: () -> String?,
     onClose: () -> Unit
 ) {
     val backgroundPainter = painterResource("background.png")
@@ -81,7 +82,7 @@ fun App(
                 ) {
                     composable(route = HLSENav.InitialScreen) {
                         InitialScreen(
-                            onSelectLoadFile = onSelectLoadFile,
+                            onSelectLoadFile = onSelectLoadFilePath,
                             onValidSaveFileSelected = { _originalFilePath, _hlSaveFileData ->
                                 HLSESQLite.initiate(_hlSaveFileData.tempSqliteFilePath)
                                 originalFilePath = _originalFilePath
@@ -103,6 +104,22 @@ fun App(
                                 },
                                 onBackup = {
                                     originalFilePath?.let(HLSaveFile::backup)
+                                },
+                                onSave = {
+                                    val saveFilePath = onSelectSaveFilePath().let {
+                                        it?.let {
+                                            if (it.endsWith(".sav")) {
+                                                it
+                                            } else {
+                                                "$it.sav"
+                                            }
+                                        }
+                                    }
+                                    val _hlSaveFileData = hlSaveFileData
+                                    if (saveFilePath != null && _hlSaveFileData != null) {
+                                        HLSaveFile.write(saveFilePath, _hlSaveFileData)
+                                    }
+                                    // TODO: Show success message
                                 },
                                 modifier = Modifier.fillMaxSize()
                             )

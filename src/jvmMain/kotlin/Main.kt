@@ -25,12 +25,20 @@ fun main() = application {
         onCloseRequest = ::myExitApplication
     ) {
         App(
-            onSelectLoadFile = {
+            onSelectLoadFilePath = {
                 val fileDialog = FileDialog(window, "Load Save Game File", FileDialog.LOAD).apply {
                     isMultipleMode = false
                     file = "*.sav"
                     directory = it
                     setFilenameFilter { _, name -> name.endsWith(".sav") }
+                    isVisible = true
+                }
+                fileDialog.files.firstOrNull()?.absolutePath
+            },
+            onSelectSaveFilePath = {
+                val fileDialog = FileDialog(window, "Save Save Game File", FileDialog.SAVE).apply {
+                    isMultipleMode = false
+                    file = "*.sav"
                     isVisible = true
                 }
                 fileDialog.files.firstOrNull()?.absolutePath
