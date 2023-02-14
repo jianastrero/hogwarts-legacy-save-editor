@@ -1,6 +1,6 @@
 package com.jianastrero.hsle
 
-enum class HSLENav {
+enum class HLSENav {
     InitialScreen,
     MainScreen
 }

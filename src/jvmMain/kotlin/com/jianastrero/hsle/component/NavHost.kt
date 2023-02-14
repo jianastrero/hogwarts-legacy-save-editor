@@ -14,14 +14,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.jianastrero.hsle.HSLENav
+import com.jianastrero.hsle.HLSENav
 import com.jianastrero.hsle.model.NavController
 import com.jianastrero.hsle.model.rememberNavController
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NavHost(
-    startDestination: HSLENav,
+    startDestination: HLSENav,
     modifier: Modifier = Modifier,
     navController: NavController = rememberNavController(),
     block: NavController.Builder.() -> Unit

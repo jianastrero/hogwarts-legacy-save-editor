@@ -71,22 +71,22 @@ fun App(
                     )
                 }
                 NavHost(
-                    startDestination = HSLENav.InitialScreen,
+                    startDestination = HLSENav.InitialScreen,
                     navController = navController,
                     modifier = Modifier.fillMaxWidth().weight(1f)
                 ) {
-                    composable(route = HSLENav.InitialScreen) {
+                    composable(route = HLSENav.InitialScreen) {
                         InitialScreen(
                             onSelectLoadFile = onSelectLoadFile,
                             onValidSaveFileSelected = {
                                 hlSaveFileData = it
-                                navController.navigate(HSLENav.MainScreen)
+                                navController.navigate(HLSENav.MainScreen)
                             },
                             modifier = Modifier.fillMaxSize()
                         )
                     }
 
-                    composable(route = HSLENav.MainScreen) {
+                    composable(route = HLSENav.MainScreen) {
                         MainScreen(modifier = Modifier.fillMaxSize())
                     }
                 }

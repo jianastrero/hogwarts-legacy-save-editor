@@ -6,20 +6,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.jianastrero.hsle.HSLENav
+import com.jianastrero.hsle.HLSENav
 
 class NavController {
-    private var onNavigate: (HSLENav) -> Unit = {}
+    private var onNavigate: (HLSENav) -> Unit = {}
 
-    fun navigate(route: HSLENav) {
+    fun navigate(route: HLSENav) {
         onNavigate(route)
     }
 
     class Builder(
-        private val startDestination: HSLENav,
+        private val startDestination: HLSENav,
         private val navController: NavController
     ) {
-        private var _destinations: Map<HSLENav, @Composable () -> Unit> by mutableStateOf(mapOf())
+        private var _destinations: Map<HLSENav, @Composable () -> Unit> by mutableStateOf(mapOf())
         private var _currentDestination by mutableStateOf(startDestination)
         val currentBlock by derivedStateOf { _destinations[_currentDestination] }
 
@@ -28,7 +28,7 @@ class NavController {
         }
 
         fun composable(
-            route: HSLENav,
+            route: HLSENav,
             block: @Composable () -> Unit
         ) {
             val newDestinations = _destinations.toMutableMap()
