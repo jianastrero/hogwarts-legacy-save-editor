@@ -15,23 +15,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.jianastrero.hsle.HSLENav
-import com.jianastrero.hsle.component.builder.NavHostBuilder
 import com.jianastrero.hsle.model.NavController
+import com.jianastrero.hsle.model.rememberNavController
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NavHost(
     startDestination: HSLENav,
-    navController: NavController,
     modifier: Modifier = Modifier,
-    block: NavHostBuilder.() -> Unit
+    navController: NavController = rememberNavController(),
+    block: NavController.Builder.() -> Unit
 ) {
 
-    val navHostBuilder by remember { mutableStateOf(NavHostBuilder(startDestination, navController)) }
-    val currentBlock by derivedStateOf { navHostBuilder.currentBlock }
+    val builder by remember { mutableStateOf(NavController.Builder(startDestination, navController)) }
+    val currentBlock by derivedStateOf { builder.currentBlock }
 
     LaunchedEffect(true) {
-        block(navHostBuilder)
+        block(builder)
     }
 
     Box(modifier = modifier) {
