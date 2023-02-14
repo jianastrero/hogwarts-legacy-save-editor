@@ -13,3 +13,9 @@ build/
 
 # Mac OS
 .DS_Store
+
+# Test Files
+/test
+
+# Temp Files
+/temp
