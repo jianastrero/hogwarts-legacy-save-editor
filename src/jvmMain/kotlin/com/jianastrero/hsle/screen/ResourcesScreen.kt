@@ -42,7 +42,8 @@ fun ResourcesScreen(
                     viewModel.updateFieldSqlite(it)
                 }
             },
-            modifier = modifier
+            modifier = modifier,
+            rows = 2
         )
     }
 

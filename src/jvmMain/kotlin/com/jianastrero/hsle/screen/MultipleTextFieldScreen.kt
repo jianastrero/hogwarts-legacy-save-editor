@@ -3,8 +3,9 @@ package com.jianastrero.hsle.screen
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -23,9 +24,12 @@ fun <T> MultipleTextFieldScreen(
     fields: List<Field<out T>>,
     onUpdateField: (Field<out T>) -> Unit,
     onUpdateFieldSqlite: (Field<out T>) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    rows: Int = 1
 ) {
-    LazyColumn(
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(rows),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier
     ) {
@@ -52,7 +56,7 @@ fun <T> TextFieldFieldItem(
     TextField(
         value = item.value.toString(),
         onValueChange = {
-            onUpdate(item.copy(it.getGenericValue()))
+            onUpdate(item.copy(it.getGenericValue(item.value)))
         },
         label = {
             Text(item.title)

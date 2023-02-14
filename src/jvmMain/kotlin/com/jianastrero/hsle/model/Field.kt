@@ -139,8 +139,10 @@ sealed class Field<T>(
             )
             fun values() = ALL_RESOURCES.sorted().map { itemId ->
                 val title = itemId.replace("_Byproduct", "")
+                    .replace("_", " ")
                     .split("[\\sA-Z]+")
                     .joinToString(" ")
+                    .trim()
                 ResourcesField(
                     title = title,
                     table = "InventoryDynamic",

@@ -1,7 +1,7 @@
 package com.jianastrero.hsle.extensions
 
-fun <T, R> T.getGenericValue(): R =
-    when (this) {
+fun <T, R> T.getGenericValue(from: R): R =
+    when (from) {
         is Int -> this.toString().toIntOrNull() ?: 0
         is Long -> this.toString().toLongOrNull() ?: 0L
         is Float -> this.toString().toFloatOrNull() ?: 0f
