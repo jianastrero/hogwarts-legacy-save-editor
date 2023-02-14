@@ -1,11 +1,13 @@
 
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jianastrero.hsle.App
 import com.jianastrero.hsle.Constants
+import com.jianastrero.hsle.sqlite.HLSESQLite
 import java.awt.FileDialog
 
 fun main() = application {
@@ -20,7 +22,7 @@ fun main() = application {
         resizable = false,
         undecorated = true,
         transparent = true,
-        onCloseRequest = ::exitApplication
+        onCloseRequest = ::myExitApplication
     ) {
         App(
             onSelectLoadFile = {
@@ -33,7 +35,12 @@ fun main() = application {
                 }
                 fileDialog.files.firstOrNull()?.absolutePath
             },
-            ::exitApplication
+            ::myExitApplication
         )
     }
+}
+
+fun ApplicationScope.myExitApplication() {
+    HLSESQLite.getInstance()?.close()
+    exitApplication()
 }
