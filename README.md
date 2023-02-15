@@ -1,4 +1,4 @@
-# 🪄![icon.png](icon.png) Hogwarts Legacy Save Editor v0.1.0
+# 🪄![icon.png](icon.png) Hogwarts Legacy Save Editor
 
 Edit your hogwarts legacy game files
 [virus total](https://www.virustotal.com/gui/file/30bc02069c7a29415a4ab52820cffc2677667f2d590157fddf81c8318af90330/detection)
