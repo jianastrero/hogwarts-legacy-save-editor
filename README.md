@@ -78,6 +78,9 @@ Edit your hogwarts legacy game files
 * Change Appearance
   * Images (for easier navigation)
 * Unlock/lock achievements
+* Unlock/lock collections
+* Unlock/lock wand
+* Change wand style
 
 ---
 
