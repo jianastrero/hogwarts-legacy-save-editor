@@ -21,4 +21,4 @@ build/
 /temp
 
 # logs
-*logs.txt
+error-logs.txt
