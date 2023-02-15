@@ -118,7 +118,6 @@ sealed class Field<T>(
                 "Jobberknoll_Byproduct",
                 "Kneazle_Byproduct",
                 "Knotgrass_Byproduct",
-                "Knuts",
                 "LacewingFlies",
                 "LeapingToadstool_Byproduct",
                 "LeechJuice",
