@@ -1,6 +1,7 @@
 # 🪄![icon.png](icon.png) Hogwarts Legacy Save Editor v0.1.0
 
 Edit your hogwarts legacy game files
+[virus total](https://www.virustotal.com/gui/file/30bc02069c7a29415a4ab52820cffc2677667f2d590157fddf81c8318af90330/detection)
 
 ### 🚀 Features
 
@@ -45,7 +46,7 @@ Edit your hogwarts legacy game files
   * TrollMucus
   * Unicorn
   * Wolf
-    ![resources_screen.png.png](screenshots/resources_screen.png)
+    ![resources_screen.png](screenshots/resources_screen.png)
 
 ### 🔮 Planned Features
 
