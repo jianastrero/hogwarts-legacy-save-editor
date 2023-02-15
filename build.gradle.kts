@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.jianastrero"
-version = "0.1.0"
+version = "0.1.1"
 
 repositories {
     google()
@@ -34,6 +34,7 @@ compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
+            modules("java.sql")
             windows {
                 iconFile.set(project.file("icon.ico"))
             }

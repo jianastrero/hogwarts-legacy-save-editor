@@ -1,12 +1,18 @@
 package com.jianastrero.hsle.sqlite
 
 import com.jianastrero.hsle.model.Field
+import java.sql.Connection
 import java.sql.DriverManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class HLSESQLite private constructor(sqliteFilePath: String) {
-    private val connection = DriverManager.getConnection("jdbc:sqlite:${sqliteFilePath}")
+    private val connection: Connection
+
+    init {
+        Class.forName("org.sqlite.JDBC")
+        connection = DriverManager.getConnection("jdbc:sqlite:${sqliteFilePath}")
+    }
 
     suspend fun <T> fetchAll(fields: List<Field<out T>>): List<Field<T>> = withContext(Dispatchers.IO) {
         val newFields = mutableListOf<Field<T>>()

@@ -10,8 +10,22 @@ import com.jianastrero.hsle.App
 import com.jianastrero.hsle.Constants
 import com.jianastrero.hsle.sqlite.HLSESQLite
 import java.awt.FileDialog
+import java.io.File
+import java.io.PrintStream
 
 fun main() = application {
+    Thread.setDefaultUncaughtExceptionHandler { _, e ->
+        val errorLogsFile = File("error-logs.txt")
+        while (!errorLogsFile.exists()) {
+            errorLogsFile.createNewFile()
+        }
+        errorLogsFile.outputStream().use { fos ->
+            PrintStream(fos).use { ps ->
+                e.printStackTrace(ps)
+            }
+        }
+    }
+
     val windowState = rememberWindowState(
         width = Constants.WINDOW_WIDTH,
         height = Constants.WINDOW_HEIGHT,
