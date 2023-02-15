@@ -1,5 +1,6 @@
 
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
@@ -19,6 +20,7 @@ fun main() = application {
     Window(
         state = windowState,
         title = "HL Save Editor",
+        icon = painterResource("icon.png"),
         resizable = false,
         undecorated = true,
         transparent = true,

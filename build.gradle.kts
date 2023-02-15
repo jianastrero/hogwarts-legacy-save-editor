@@ -34,9 +34,13 @@ compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            windows {
+                iconFile.set(project.file("icon.ico"))
+            }
+
+            targetFormats(TargetFormat.Exe)
             packageName = "hogwarts-legacy-save-editor"
-            packageVersion = "1.0.0"
+            packageVersion = project.version.toString()
         }
     }
 }
