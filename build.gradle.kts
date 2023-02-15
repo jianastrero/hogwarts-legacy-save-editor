@@ -43,5 +43,11 @@ compose.desktop {
             packageName = "hogwarts-legacy-save-editor"
             packageVersion = project.version.toString()
         }
+        buildTypes {
+            release {
+                proguard.isEnabled.set(false)
+                proguard.obfuscate.set(false)
+            }
+        }
     }
 }
