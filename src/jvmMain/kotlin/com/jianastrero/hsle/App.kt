@@ -1,8 +1,14 @@
 package com.jianastrero.hsle
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +17,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -24,15 +34,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.jianastrero.hsle.component.NavHost
+import com.jianastrero.hsle.component.NotificationItem
 import com.jianastrero.hsle.model.HLSaveFileData
 import com.jianastrero.hsle.model.rememberNavController
 import com.jianastrero.hsle.nav.HLSENav
+import com.jianastrero.hsle.notification.Notifications
 import com.jianastrero.hsle.save_file.HLSaveFile
 import com.jianastrero.hsle.screen.InitialScreen
 import com.jianastrero.hsle.screen.MainScreen
 import com.jianastrero.hsle.sqlite.HLSESQLite
 import com.jianastrero.hsle.theme.NotoSerifTypography
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Preview
 fun App(
@@ -104,6 +117,7 @@ fun App(
                                 },
                                 onBackup = {
                                     originalFilePath?.let(HLSaveFile::backup)
+                                    Notifications.success("Successfully backup. You could find your backups on \"backups\" folder.")
                                 },
                                 onSave = {
                                     val saveFilePath = onSelectSaveFilePath().let {
@@ -118,15 +132,35 @@ fun App(
                                     val _hlSaveFileData = hlSaveFileData
                                     if (saveFilePath != null && _hlSaveFileData != null) {
                                         HLSaveFile.write(saveFilePath, _hlSaveFileData)
+                                        Notifications.success("Successfully saved \"save game\" file")
                                     }
-                                    // TODO: Show success message
                                 },
                                 modifier = Modifier.fillMaxSize()
                             )
                         } ?: kotlin.run {
                             navController.navigate(HLSENav.InitialScreen)
-                            // TODO: Show error, file is not readable
+                            Notifications.error("You selected an invalid save file")
                         }
+                    }
+                }
+            }
+            AnimatedVisibility(
+                Notifications.notifications.isNotEmpty(),
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.TopEnd)
+            ) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.wrapContentHeight()
+                        .width(320.dp)
+                        .padding(12.dp)
+                ) {
+                    items(Notifications.notifications) {
+                        NotificationItem(
+                            notification = it,
+                            modifier = Modifier.animateItemPlacement(tween())
+                        )
                     }
                 }
             }

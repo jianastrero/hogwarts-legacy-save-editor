@@ -1,4 +1,5 @@
 
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.ApplicationScope
@@ -8,14 +9,22 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.jianastrero.hsle.App
 import com.jianastrero.hsle.Constants
+import com.jianastrero.hsle.enumerations.NotificationType
+import com.jianastrero.hsle.model.Notification
+import com.jianastrero.hsle.notification.Notifications
 import com.jianastrero.hsle.sqlite.HLSESQLite
 import java.awt.FileDialog
 import java.io.File
 import java.io.PrintStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 fun main() = application {
+    val errorLogsFile = File("error-logs.txt")
+
     Thread.setDefaultUncaughtExceptionHandler { _, e ->
-        val errorLogsFile = File("error-logs.txt")
+        Notifications.error(e.cause?.message ?: "Something went wrong")
         while (!errorLogsFile.exists()) {
             errorLogsFile.createNewFile()
         }
@@ -26,11 +35,13 @@ fun main() = application {
         }
     }
 
+    val defaultScope = rememberCoroutineScope { Dispatchers.Default }
     val windowState = rememberWindowState(
         width = Constants.WINDOW_WIDTH,
         height = Constants.WINDOW_HEIGHT,
         position = WindowPosition(Alignment.Center)
     )
+
     Window(
         state = windowState,
         title = "HL Save Editor",
@@ -61,6 +72,23 @@ fun main() = application {
             },
             ::myExitApplication
         )
+
+        defaultScope.launch {
+            while (!window.isVisible) {
+                delay(500) // Wait till window is visible
+            }
+            while (window.isVisible) {
+                try {
+                    delay(500)
+                    val oldestNotification = Notifications.peek()
+                    if (oldestNotification != null && oldestNotification.time + 2_000 <= System.currentTimeMillis()) {
+                        Notifications.pop()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 }
 

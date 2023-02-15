@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.jianastrero.hsle.component.HLSEButton
 import com.jianastrero.hsle.model.HLSaveFileData
+import com.jianastrero.hsle.notification.Notifications
 import com.jianastrero.hsle.save_file.HLSaveFile
 import java.io.File
 
@@ -33,7 +34,7 @@ fun InitialScreen(
                     onValidSaveFileSelected(selectedFilePath, hlSaveFileData)
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    // TODO: Show file invalid error message
+                    Notifications.error("You selected an invalid save file")
                 }
             },
             modifier = Modifier.align(Alignment.Center)

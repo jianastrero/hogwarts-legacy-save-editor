@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.jianastrero.hsle.enumerations.LoadablePageState
 import com.jianastrero.hsle.model.Field
+import com.jianastrero.hsle.notification.Notifications
 import com.jianastrero.hsle.sqlite.HLSESQLite
 import com.jianastrero.hsle.state.FieldState
 import kotlinx.coroutines.Dispatchers
@@ -39,8 +40,7 @@ class FieldViewModel<T>(list: List<Field<out T>>) {
             )
         } catch (e: Exception) {
             e.printStackTrace()
-            updateState(loadablePageState = LoadablePageState.Error(e.message ?: "Something went wrong"))
-            // TODO: Handle errors
+            Notifications.error(e.message ?: "Something went wrong")
         }
     }
 
