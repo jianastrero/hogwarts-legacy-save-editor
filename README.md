@@ -6,6 +6,8 @@
 Edit your hogwarts legacy game files (Offline Tool)
 [**virus total**](https://www.virustotal.com/gui/file/30bc02069c7a29415a4ab52820cffc2677667f2d590157fddf81c8318af90330/detection)
 
+[![Watch the video](https://img.youtube.com/vi/NreJ3Vk_e10/default.jpg)](https://youtu.be/NreJ3Vk_e10)
+
 ---
 
 ### ❔How to use
