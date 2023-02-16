@@ -25,6 +25,7 @@ sealed class Field<T>(
         is PersonalDataField.Galleons -> PersonalDataField.Galleons(value = newValue as Int)
         is PersonalDataField.TalentPoints -> PersonalDataField.TalentPoints(value = newValue as Int)
         is PersonalDataField.House -> PersonalDataField.House(value = newValue as String)
+        is AchievementField -> copy(value = newValue as Boolean)
         is ResourcesField -> copy(value = newValue as Int)
     } as Field<T>
 
@@ -100,7 +101,6 @@ sealed class Field<T>(
 
             return true
         }
-
         override fun hashCode(): Int {
             var result = title.hashCode()
             result = 31 * result + table.hashCode()
@@ -109,7 +109,6 @@ sealed class Field<T>(
             result = 31 * result + value
             return result
         }
-
         companion object {
             fun values() = this::class.java.getResource("/lists/resources.txt")
                 ?.readText()
@@ -134,6 +133,37 @@ sealed class Field<T>(
                     )
                 }
                 ?: emptyList()
+        }
+    }
+
+    data class AchievementField(
+        override val title: String,
+        override val table: String,
+        override val identifiers: Array<Pair<String, String>>,
+        override val valueColumn: String,
+        override val value: Boolean
+    ) : Field<Boolean>(title, table, identifiers, valueColumn, value) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as AchievementField
+
+            if (title != other.title) return false
+            if (table != other.table) return false
+            if (!identifiers.contentEquals(other.identifiers)) return false
+            if (valueColumn != other.valueColumn) return false
+            if (value != other.value) return false
+
+            return true
+        }
+        override fun hashCode(): Int {
+            var result = title.hashCode()
+            result = 31 * result + table.hashCode()
+            result = 31 * result + identifiers.contentHashCode()
+            result = 31 * result + valueColumn.hashCode()
+            result = 31 * result + value.hashCode()
+            return result
         }
     }
 }
