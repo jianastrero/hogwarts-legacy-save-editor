@@ -24,6 +24,7 @@ sealed class Field<T>(
         is PersonalDataField.Experience -> PersonalDataField.Experience(value = newValue as Int)
         is PersonalDataField.Galleons -> PersonalDataField.Galleons(value = newValue as Int)
         is PersonalDataField.TalentPoints -> PersonalDataField.TalentPoints(value = newValue as Int)
+        is PersonalDataField.House -> PersonalDataField.House(value = newValue as String)
         is ResourcesField -> copy(value = newValue as Int)
     } as Field<T>
 
@@ -66,6 +67,13 @@ sealed class Field<T>(
             title = "Talent Points",
             table = "MiscDataDynamic",
             identifiers = arrayOf("DataOwner" to "Player0", "DataName" to "PerkPoints"),
+            valueColumn = "DataValue",
+            value = value
+        )
+        class House(value: String) : PersonalDataField<String>(
+            title = "House",
+            table = "MiscDataDynamic",
+            identifiers = arrayOf("DataName" to "HouseID"),
             valueColumn = "DataValue",
             value = value
         )

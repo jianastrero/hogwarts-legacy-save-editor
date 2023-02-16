@@ -3,7 +3,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/jianastrero/hogwarts-legacy-save-editor)
 ![GitHub all releases](https://img.shields.io/github/downloads/jianastrero/hogwarts-legacy-save-editor/total)
 
-Edit your hogwarts legacy game files
+Edit your hogwarts legacy game files (Offline Tool)
 [**virus total**](https://www.virustotal.com/gui/file/30bc02069c7a29415a4ab52820cffc2677667f2d590157fddf81c8318af90330/detection)
 
 ---
@@ -28,45 +28,28 @@ Edit your hogwarts legacy game files
 
 * Load/Save/Backup Hogwarts Legacy Save File
 * **Edit Player Data**
+
   * First Name
   * Last Name
   * Experience
   * Galleons
   * Talent Points
+  * ✨ _New_ ✨ Change House
     ![personal_data_screen.png](screenshots/personal_data_screen.png)
 * **Edit Inventory Values**
-  * Ashwinder Eggs
-  * Diricawl
-  * Dittany
-  * Dugbog Pellet
-  * Fertiliser
-  * Fluxweed
-  * Fwooper
-  * Graphorn
-  * Hippogriff
-  * Horklump Juice
-  * Jobberknoll
-  * Kneazle
-  * Knotgrass
-  * LacewingFlies
-  * Leaping Toadstool
-  * Leech Juice
-  * Mallowsweet
-  * Mooncalf
-  * Moonstone
-  * Niffler
-  * Phoenix
-  * Puffskein
-  * Shrivelfig
-  * Spider Fang
-  * Stench Of The Dead
-  * Thestral
-  * Toad
-  * TrollMucus
-  * Unicorn
-  * Wolf
-    ![resources_screen.png](screenshots/resources_screen.png)
-  *
+
+
+|       -        |      -      |      -      |       -        |         -          |
+|:--------------:|:-----------:|:-----------:|:--------------:|:------------------:|
+| Ashwinder Eggs |  Diricawl   |   Dittany   | Dugbog Pellet  |     Fertiliser     |
+|    Fluxweed    |   Fwooper   |  Graphorn   |   Hippogriff   |   Horklump Juice   |
+|  Jobberknoll   |   Kneazle   |  Knotgrass  | Lacewing Flies | Leaping Toadstool  |
+|  Leech Juice   | Mallowsweet |  Mooncalf   |   Moonstone    |      Niffler       |
+|    Phoenix     |  Puffskein  | Shrivelfig  |  Spider Fang   | Stench Of The Dead |
+|    Thestral    |    Toad     | Troll Mucus |    Unicorn     |        Wolf        |
+
+![resources_screen.png](screenshots/resources_screen.png)
+
 * Info/Error/Success messages
 
 ### 🔮 Planned Features
@@ -76,8 +59,8 @@ Edit your hogwarts legacy game files
 * Validation of resource values
 * Images for the resources (for easier navigation)
   * If someone could help by sharing their save game file with all items in their inventory so i could update the resources
-* Change house
-  * Images (for easier navigation)
+* ~~Change house~~
+  * ~~Images (for easier navigation)~~
 * Change Appearance
   * Images (for easier navigation)
 * Unlock/lock achievements
