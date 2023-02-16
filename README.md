@@ -69,6 +69,7 @@ Edit your hogwarts legacy game files (Offline Tool)
 * Unlock/lock collections
 * Unlock/lock wand
 * Change wand style
+* Change gender
 
 ---
 
