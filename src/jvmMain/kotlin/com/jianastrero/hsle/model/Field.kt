@@ -100,7 +100,6 @@ sealed class Field<T>(
 
             return true
         }
-
         override fun hashCode(): Int {
             var result = title.hashCode()
             result = 31 * result + table.hashCode()
@@ -109,59 +108,30 @@ sealed class Field<T>(
             result = 31 * result + value
             return result
         }
-
         companion object {
-
-            private val ALL_RESOURCES = arrayOf(
-                "AshwinderEggs",
-                "Diricawl_Byproduct",
-                "Dittany_Byproduct",
-                "Dugbog_Pellet",
-                "Fertiliser",
-                "Fluxweed_Byproduct",
-                "Fwooper_Byproduct",
-                "Graphorn_Byproduct",
-                "Hippogriff_Byproduct",
-                "HorklumpJuice",
-                "Jobberknoll_Byproduct",
-                "Kneazle_Byproduct",
-                "Knotgrass_Byproduct",
-                "LacewingFlies",
-                "LeapingToadstool_Byproduct",
-                "LeechJuice",
-                "Mallowsweet_Byproduct",
-                "Mooncalf_Byproduct",
-                "Moonstone",
-                "Niffler_Byproduct",
-                "Phoenix_Byproduct",
-                "Puffskein_Byproduct",
-                "Shrivelfig_Byproduct",
-                "Spider_Fang",
-                "StenchOfTheDead",
-                "Thestral_Byproduct",
-                "Toad_Byproduct",
-                "TrollMucus",
-                "Unicorn_Byproduct",
-                "Wolf_Byproduct"
-            )
-            fun values() = ALL_RESOURCES.sorted().map { itemId ->
-                val title = itemId.replace("_Byproduct", "")
-                    .replace("_", " ")
-                    .split("[\\sA-Z]+")
-                    .joinToString(" ")
-                    .trim()
-                ResourcesField(
-                    title = title,
-                    table = "InventoryDynamic",
-                    identifiers = arrayOf(
-                        "CharacterID" to "Player0",
-                        "HolderID" to "ResourceInventory",
-                        "ItemID" to itemId
-                    ),
-                    valueColumn = "Count",
-                    value = 0
-                )
-            }
+            fun values() = this::class.java.getResource("/lists/resources.txt")
+                ?.readText()
+                ?.split("\\s+".toRegex())
+                ?.sorted()
+                ?.map { itemId ->
+                    val title = itemId.replace("_Byproduct", "")
+                        .replace("_", " ")
+                        .split("[\\sA-Z]+")
+                        .joinToString(" ")
+                        .trim()
+                    ResourcesField(
+                        title = title,
+                        table = "InventoryDynamic",
+                        identifiers = arrayOf(
+                            "CharacterID" to "Player0",
+                            "HolderID" to "ResourceInventory",
+                            "ItemID" to itemId
+                        ),
+                        valueColumn = "Count",
+                        value = 0
+                    )
+                }
+                ?: emptyList()
         }
     }
 }
