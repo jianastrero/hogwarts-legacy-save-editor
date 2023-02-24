@@ -4,7 +4,10 @@
 ![GitHub all releases](https://img.shields.io/github/downloads/jianastrero/hogwarts-legacy-save-editor/total)
 
 Edit your hogwarts legacy game files (Offline Tool)
+
 [**virus total**](https://www.virustotal.com/gui/file/f09b183c8ab00d41b9f2bd9b43178af724d7e237a5234865130f456f72f4c46c)
+
+*Note: Careful using this tool. No validation of values yet so you might break your files. Backups are automatically saved upon startup and you can manually backup your files using the button or by doing it on your own.*
 
 [![Watch the video](https://img.youtube.com/vi/NreJ3Vk_e10/default.jpg)](https://youtu.be/NreJ3Vk_e10)
 
