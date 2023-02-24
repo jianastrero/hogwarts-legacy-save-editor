@@ -1,0 +1,3 @@
+[submodule "gvas-tool"]
+	path = gvas-tool
+	url = git@github.com:jianastrero/gvas-tool.git
