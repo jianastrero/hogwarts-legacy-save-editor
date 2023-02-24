@@ -13,4 +13,4 @@ pluginManagement {
 }
 
 rootProject.name = "hogwarts-legacy-save-editor"
-
+include(":gvas-tool")

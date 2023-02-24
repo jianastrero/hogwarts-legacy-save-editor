@@ -23,12 +23,10 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation(kotlin("reflect"))
 
                 implementation("org.xerial:sqlite-jdbc:3.40.1.0")
 
-                implementation("com.google.guava:guava:31.1-jre")
-                api("com.google.guava:guava:31.1-jre")
+                implementation(project(mapOf("path" to ":gvas-tool")))
             }
         }
         val jvmTest by getting

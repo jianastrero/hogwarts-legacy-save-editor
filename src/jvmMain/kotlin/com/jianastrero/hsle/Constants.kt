@@ -688,6 +688,8 @@ object Constants {
             "jianastrero/hogwarts-legacy-save-editor/" +
             "main/src/jvmMain/resources/version.txt"
 
+    const val BACKUP_PATH = ".\\backup"
+
     val HL_SAVE_GAMES_DIR: String?
         get() {
             val appDataDirFile = File(System.getenv("APPDATA")).parentFile

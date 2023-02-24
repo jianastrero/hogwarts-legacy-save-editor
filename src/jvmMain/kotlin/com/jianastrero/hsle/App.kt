@@ -714,6 +714,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.jianastrero.gvas_tool.Gvas
 import com.jianastrero.hsle.component.NavHost
 import com.jianastrero.hsle.component.NotificationItem
 import com.jianastrero.hsle.component.rememberNavController
@@ -729,7 +730,7 @@ import kotlinx.coroutines.delay
 @Composable
 @Preview
 fun App(
-    saveGameFile: SaveGameFile,
+    gvas: Gvas,
     onClose: () -> Unit
 ) {
     val backgroundPainter = painterResource("background.jpg")
@@ -786,7 +787,7 @@ fun App(
 
                     composable(HLSENav.MainScreen::class) {
                         MainScreen(
-                            saveGameFile = saveGameFile,
+                            gvas = gvas,
                             modifier = Modifier.fillMaxSize()
                         )
                     }
@@ -815,7 +816,7 @@ fun App(
         }
     }
 
-    LaunchedEffect(saveGameFile) {
+    LaunchedEffect(gvas) {
         delay(5_000)
         navController.navigate(HLSENav.MainScreen)
     }
