@@ -77,7 +77,7 @@ Edit your hogwarts legacy game files (Offline Tool)
 
 <a href="https://www.buymeacoffee.com/jianastrero" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
-### LICENSE
+### [LICENSE](https://github.com/jianastrero/hogwarts-legacy-save-editor/blob/main/LICENSE)
 
 > ```
 >                     GNU GENERAL PUBLIC LICENSE
