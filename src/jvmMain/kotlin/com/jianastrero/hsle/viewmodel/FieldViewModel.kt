@@ -714,7 +714,7 @@ class FieldViewModel<T>(
         try {
             updateState(loadablePageState = LoadablePageState.Loading)
 
-            val fields = sqlite.fetchAll(state.fields) ?: state.fields
+            val fields = sqlite.fetchAll(state.fields)
 
             updateState(
                 loadablePageState = LoadablePageState.Loaded,
@@ -737,7 +737,7 @@ class FieldViewModel<T>(
         updateState(fields = newFields)
     }
 
-    suspend fun updateFieldPersistently(field: Field<out T>) = withContext(Dispatchers.IO) {
+    suspend fun updateFieldPersistently(field: Field<out T>): Character? = withContext(Dispatchers.IO) {
         sqlite.updateField(field)
 
         if (field is Field.PersonalDataField.FirstName || field is Field.PersonalDataField.LastName) {
@@ -753,7 +753,8 @@ class FieldViewModel<T>(
                     lastName = field.value
                 }
             }
-            character.withName("$firstName $lastName")
+            return@withContext character.withName("$firstName $lastName")
         }
+        null
     }
 }

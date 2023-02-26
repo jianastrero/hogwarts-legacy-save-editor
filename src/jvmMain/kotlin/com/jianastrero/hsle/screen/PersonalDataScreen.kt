@@ -718,6 +718,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PersonalDataScreen(
     character: Character,
+    onCharacterUpdated: (Character) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel by remember {
@@ -756,7 +757,7 @@ fun PersonalDataScreen(
                     },
                     onUpdatesqlite = {
                         ioScope.launch {
-                            viewModel.updateFieldPersistently(it)
+                            viewModel.updateFieldPersistently(it)?.also(onCharacterUpdated)
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -783,7 +784,7 @@ fun PersonalDataScreen(
                                 ioScope.launch {
                                     userHouse?.let {
                                         val newField = it.copy(newValue = item.value)
-                                        viewModel.updateFieldPersistently(newField)
+                                        viewModel.updateFieldPersistently(newField)?.also(onCharacterUpdated)
                                         viewModel.updateField(newField)
                                     }
                                 }

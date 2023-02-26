@@ -729,9 +729,7 @@ fun main() = application {
         transparent = true,
         onCloseRequest = ::exitApplication
     ) {
-        App(
-            onClose = ::exitApplication
-        )
+        App(onClose = ::exitApplication)
 
         defaultScope.launch {
             val latestVersion = getLatestVersion()

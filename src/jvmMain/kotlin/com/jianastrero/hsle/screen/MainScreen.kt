@@ -736,6 +736,16 @@ fun MainScreen(
     val bmcPainter = painterResource("bmc.svg")
     var selectedCharacter: Character? by remember { mutableStateOf(null) }
 
+
+    fun updateSelectedCharacter(character: Character) {
+        val newCharacterList = characterList.toMutableList()
+        val index = newCharacterList.indexOfFirst { it.id == character.id }
+        newCharacterList[index] = character
+        characterList = newCharacterList
+        selectedCharacter = character
+    }
+
+
     Row(modifier = modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -854,6 +864,7 @@ fun MainScreen(
                 selectedCharacter?.let { character ->
                         PersonalDataScreen(
                             character = character,
+                            onCharacterUpdated = ::updateSelectedCharacter,
                             modifier = Modifier.fillMaxSize()
                                 .padding(
                                     start = 12.dp,

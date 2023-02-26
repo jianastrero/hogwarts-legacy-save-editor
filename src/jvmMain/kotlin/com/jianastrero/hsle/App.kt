@@ -733,9 +733,7 @@ import com.jianastrero.hsle.util.loadSaveGame
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Preview
-fun App(
-    onClose: () -> Unit
-) {
+fun App(onClose: () -> Unit) {
     var gvas by remember { mutableStateOf(Gvas.None) }
 
     val backgroundPainter = painterResource("background.jpg")
