@@ -677,19 +677,24 @@
 
 package com.jianastrero.hsle.screen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -704,9 +709,14 @@ import com.jianastrero.gvas_tool.Gvas
 import com.jianastrero.hsle.component.HoverButton
 import com.jianastrero.hsle.component.NavHost
 import com.jianastrero.hsle.component.rememberNavController
+import com.jianastrero.hsle.enumerations.HouseCrest
+import com.jianastrero.hsle.icon.vector.ChevronRight
+import com.jianastrero.hsle.model.Character
 import com.jianastrero.hsle.nav.HLSENav
+import com.jianastrero.hsle.nav.HLSENav.Main.Empty.sqlite
 import com.jianastrero.hsle.notification.Notifications
 import com.jianastrero.hsle.theme.BlueLight
+import com.jianastrero.hsle.theme.GreenLight
 import com.jianastrero.hsle.theme.Yellow
 import com.jianastrero.hsle.theme.YellowLight
 import com.jianastrero.hsle.util.backup
@@ -716,6 +726,7 @@ import java.net.URI
 @Composable
 fun MainScreen(
     gvas: Gvas,
+    characterList: List<Character>,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -734,56 +745,52 @@ fun MainScreen(
                 modifier = Modifier.weight(1f)
                     .fillMaxWidth()
             ) {
-//                items(gvas.characterList) { character ->
-//                    val houseCrest = HouseCrest.values()
-//                        .first { it.value.lowercase() == character.house.lowercase() }
-//                    val sqlite = gvas.saveFileList.firstOrNull { it.characterID == character.id }
-//                        ?.characterSaveFileData
-//                        ?.sqlite
-//                        ?: throw  RuntimeException("Don't delete the temp files nerd")
-//                    val isSelected = selectedCharacter == character
-//
-//                    Column(
-//                        verticalArrangement = Arrangement.spacedBy(6.dp)
-//                    ) {
-//                        HoverButton(
-//                            text = character.toString(),
-//                            onClick = { selectedCharacter = character },
-//                            selected = isSelected,
-//                            leadingIcon = houseCrest.imageVector,
-//                            leadingIconTint = houseCrest.colorLight,
-//                            trailingIcon = Icons.Rounded.ArrowDropDown,
-//                            modifier = Modifier.fillMaxWidth()
-//                        )
-//                        AnimatedVisibility(
-//                            visible = isSelected,
-//                            modifier = Modifier.align(Alignment.End)
-//                        ) {
-//                            Column(
-//                                verticalArrangement = Arrangement.spacedBy(6.dp)
-//                            ) {
-//                                HoverButton(
-//                                    text = "Player Data",
-//                                    onClick = {
-//                                        navController.navigate(HLSENav.Main.PlayerData(sqlite))
-//                                    },
-//                                    selectedColor = GreenLight,
-//                                    trailingIcon = Icons.Rounded.ChevronRight,
-//                                    modifier = Modifier.fillMaxWidth(0.9f)
-//                                )
-//                                HoverButton(
-//                                    text = "Resources",
-//                                    onClick = {
-//                                        navController.navigate(HLSENav.Main.Resources(sqlite))
-//                                    },
-//                                    selectedColor = GreenLight,
-//                                    trailingIcon = Icons.Rounded.ChevronRight,
-//                                    modifier = Modifier.fillMaxWidth(0.9f)
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
+                items(characterList) { character ->
+                    val houseCrest = HouseCrest.values()
+                        .first { it.value.lowercase() == character.house.lowercase() }
+                    val isSelected = selectedCharacter == character
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        HoverButton(
+                            text = character.toString(),
+                            onClick = { selectedCharacter = character },
+                            selected = isSelected,
+                            leadingIcon = houseCrest.imageVector,
+                            leadingIconTint = houseCrest.colorLight,
+                            trailingIcon = Icons.Rounded.ArrowDropDown,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        AnimatedVisibility(
+                            visible = isSelected,
+                            modifier = Modifier.align(Alignment.End)
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                HoverButton(
+                                    text = "Player Data",
+                                    onClick = {
+                                        navController.navigate(HLSENav.Main.PlayerData(sqlite))
+                                    },
+                                    selectedColor = GreenLight,
+                                    trailingIcon = Icons.Rounded.ChevronRight,
+                                    modifier = Modifier.fillMaxWidth(0.9f)
+                                )
+                                HoverButton(
+                                    text = "Resources",
+                                    onClick = {
+                                        navController.navigate(HLSENav.Main.Resources(sqlite))
+                                    },
+                                    selectedColor = GreenLight,
+                                    trailingIcon = Icons.Rounded.ChevronRight,
+                                    modifier = Modifier.fillMaxWidth(0.9f)
+                                )
+                            }
+                        }
+                    }
+                }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 HoverButton(
@@ -840,46 +847,42 @@ fun MainScreen(
             composable(HLSENav.Main.Empty::class) {
                 Spacer(modifier = Modifier)
             }
-//            composable(HLSENav.Main.PlayerData::class) {
-//                gvas.saveFileList.firstOrNull { it.characterID == selectedCharacter?.id }
-//                    ?.characterSaveFileData
-//                    ?.sqlite
-//                    ?.let { sqlite ->
-//                        PersonalDataScreen(
-//                            sqlite = sqlite,
-//                            modifier = Modifier.fillMaxSize()
-//                                .padding(
-//                                    start = 12.dp,
-//                                    top = 12.dp,
-//                                    bottom = 12.dp,
-//                                    end = 24.dp
-//                                )
-//                        )
-//                    }
-//                    ?: kotlin.run {
-//                        Notifications.error("Please don't delete your temp file nerd")
-//                    }
-//            }
-//            composable(HLSENav.Main.Resources::class) {
-//                gvas.saveFileList.firstOrNull { it.characterID == selectedCharacter?.id }
-//                    ?.characterSaveFileData
-//                    ?.sqlite
-//                    ?.let { sqlite ->
-//                        ResourcesScreen(
-//                            sqlite = sqlite,
-//                            modifier = Modifier.fillMaxSize()
-//                                .padding(
-//                                    start = 12.dp,
-//                                    top = 12.dp,
-//                                    bottom = 12.dp,
-//                                    end = 24.dp
-//                                )
-//                        )
-//                    }
-//                    ?: kotlin.run {
-//                        Notifications.error("Please don't delete your temp file nerd")
-//                    }
-//            }
+            composable(HLSENav.Main.PlayerData::class) {
+                selectedCharacter?.saveFileData?.sqlite
+                    ?.let { sqlite ->
+                        PersonalDataScreen(
+                            sqlite = sqlite,
+                            modifier = Modifier.fillMaxSize()
+                                .padding(
+                                    start = 12.dp,
+                                    top = 12.dp,
+                                    bottom = 12.dp,
+                                    end = 24.dp
+                                )
+                        )
+                    }
+                    ?: kotlin.run {
+                        Notifications.error("Please don't delete your temp file nerd")
+                    }
+            }
+            composable(HLSENav.Main.Resources::class) {
+                selectedCharacter?.saveFileData?.sqlite
+                    ?.let { sqlite ->
+                        ResourcesScreen(
+                            sqlite = sqlite,
+                            modifier = Modifier.fillMaxSize()
+                                .padding(
+                                    start = 12.dp,
+                                    top = 12.dp,
+                                    bottom = 12.dp,
+                                    end = 24.dp
+                                )
+                        )
+                    }
+                    ?: kotlin.run {
+                        Notifications.error("Please don't delete your temp file nerd")
+                    }
+            }
         }
     }
 }
