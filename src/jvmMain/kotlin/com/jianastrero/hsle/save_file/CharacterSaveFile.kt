@@ -682,6 +682,8 @@ import com.jianastrero.hsle.extensions.littleEndian
 import com.jianastrero.hsle.model.CharacterSaveFileData
 import com.jianastrero.hsle.sqlite.SQLite
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 object CharacterSaveFile {
 
@@ -693,7 +695,8 @@ object CharacterSaveFile {
     )
     private const val TEMP_FOLDER = "temp"
 
-    fun read(filePath: String): CharacterSaveFileData {
+    suspend fun read(filePath: String): CharacterSaveFileData = withContext(Dispatchers.IO) {
+
         val bytes = File(filePath).readBytes()
 
         val rawDbImageStartIndex = bytes.findFirst(RAW_DB_IMAGE_BYTES)
@@ -710,7 +713,7 @@ object CharacterSaveFile {
             it.flush()
         }
 
-        return CharacterSaveFileData(
+        CharacterSaveFileData(
             tempSqliteFilePath = tempSqliteFile.absolutePath,
             saveFileBytes = bytes,
             rawDbImageStartIndex = rawDbImageStartIndex,
@@ -719,7 +722,10 @@ object CharacterSaveFile {
         )
     }
 
-    fun write(filePath: String, characterSaveFileData: CharacterSaveFileData) {
+    suspend fun write(
+        filePath: String,
+        characterSaveFileData: CharacterSaveFileData
+    ): Unit = withContext(Dispatchers.IO) {
         val tempSqliteBytes = File(characterSaveFileData.tempSqliteFilePath).readBytes()
         val newSaveFile = File(filePath)
         newSaveFile.outputStream().use {

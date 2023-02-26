@@ -707,6 +707,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -718,23 +722,22 @@ import com.jianastrero.gvas_tool.Gvas
 import com.jianastrero.hsle.component.NavHost
 import com.jianastrero.hsle.component.NotificationItem
 import com.jianastrero.hsle.component.rememberNavController
-import com.jianastrero.hsle.model.Character
 import com.jianastrero.hsle.nav.HLSENav
 import com.jianastrero.hsle.notification.Notifications
 import com.jianastrero.hsle.screen.InitialScreen
 import com.jianastrero.hsle.screen.MainScreen
 import com.jianastrero.hsle.theme.HLSETheme
 import com.jianastrero.hsle.theme.Red
-import kotlinx.coroutines.delay
+import com.jianastrero.hsle.util.loadSaveGame
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Preview
 fun App(
-    gvas: Gvas,
-    characterList: List<Character>,
     onClose: () -> Unit
 ) {
+    var gvas by remember { mutableStateOf(Gvas.None) }
+
     val backgroundPainter = painterResource("background.jpg")
     val titlePainter = painterResource("title.png")
     val navController = rememberNavController()
@@ -790,7 +793,6 @@ fun App(
                     composable(HLSENav.MainScreen::class) {
                         MainScreen(
                             gvas = gvas,
-                            characterList = characterList,
                             modifier = Modifier.fillMaxSize()
                         )
                     }
@@ -820,7 +822,9 @@ fun App(
     }
 
     LaunchedEffect(gvas) {
-        delay(30_000)
-        navController.navigate(HLSENav.MainScreen)
+        if (gvas == Gvas.None) {
+            gvas = loadSaveGame()
+            navController.navigate(HLSENav.MainScreen)
+        }
     }
 }

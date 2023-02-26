@@ -677,7 +677,6 @@
 
 package com.jianastrero.hsle.screen
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -710,21 +709,21 @@ import androidx.compose.ui.unit.dp
 import com.jianastrero.hsle.component.LoadablePage
 import com.jianastrero.hsle.component.TextFieldFieldItem
 import com.jianastrero.hsle.enumerations.HouseCrest
+import com.jianastrero.hsle.model.Character
 import com.jianastrero.hsle.model.Field
-import com.jianastrero.hsle.sqlite.SQLite
 import com.jianastrero.hsle.viewmodel.FieldViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
 fun PersonalDataScreen(
-    sqlite: SQLite,
+    character: Character,
     modifier: Modifier = Modifier
 ) {
     val viewModel by remember {
         mutableStateOf(
             FieldViewModel(
-                sqlite = sqlite,
+                character = character,
                 list = listOf(
                     Field.PersonalDataField.FirstName(""),
                     Field.PersonalDataField.LastName(""),
@@ -757,7 +756,7 @@ fun PersonalDataScreen(
                     },
                     onUpdatesqlite = {
                         ioScope.launch {
-                            viewModel.updateFieldSqlite(it)
+                            viewModel.updateFieldPersistently(it)
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -784,7 +783,7 @@ fun PersonalDataScreen(
                                 ioScope.launch {
                                     userHouse?.let {
                                         val newField = it.copy(newValue = item.value)
-                                        viewModel.updateFieldSqlite(newField)
+                                        viewModel.updateFieldPersistently(newField)
                                         viewModel.updateField(newField)
                                     }
                                 }
@@ -812,13 +811,4 @@ fun PersonalDataScreen(
     LaunchedEffect(true)  {
         viewModel.fetch()
     }
-}
-
-@Composable
-@Preview
-private fun PersonalDataScreenPreview() {
-    PersonalDataScreen(
-        sqlite = SQLite.None,
-        modifier = Modifier.fillMaxWidth()
-    )
 }

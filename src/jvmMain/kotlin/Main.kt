@@ -682,24 +682,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.jianastrero.gvas_tool.Gvas
-import com.jianastrero.gvas_tool.model.property.ArrayProperty
-import com.jianastrero.gvas_tool.model.property.BoolProperty
-import com.jianastrero.gvas_tool.model.property.Int64Property
-import com.jianastrero.gvas_tool.model.property.IntProperty
-import com.jianastrero.gvas_tool.model.property.StrProperty
-import com.jianastrero.gvas_tool.model.property.StructProperty
 import com.jianastrero.hsle.App
 import com.jianastrero.hsle.Constants
-import com.jianastrero.hsle.model.Character
 import com.jianastrero.hsle.notification.Notifications
-import com.jianastrero.hsle.save_file.CharacterSaveFile
-import com.jianastrero.hsle.util.backup
 import com.jianastrero.hsle.util.getCurrentVersion
 import com.jianastrero.hsle.util.getLatestVersion
 import java.io.File
@@ -709,16 +698,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 fun main() = application {
-    val gvas by remember { mutableStateOf(loadSaveGame()) }
-    val characterList by remember { mutableStateOf(getCharacters(gvas)) }
     val errorLogsFile by remember { mutableStateOf(File("error-logs.txt")) }
-
-    fun ApplicationScope.myExitApplication() {
-//        saveGameFile.saveFileList.forEach {
-//            it.characterSaveFileData?.sqlite?.close()
-//        }
-        exitApplication()
-    }
 
     Thread.setDefaultUncaughtExceptionHandler { _, e ->
         e.printStackTrace()
@@ -747,12 +727,10 @@ fun main() = application {
         resizable = false,
         undecorated = true,
         transparent = true,
-        onCloseRequest = ::myExitApplication
+        onCloseRequest = ::exitApplication
     ) {
         App(
-            gvas = gvas,
-            characterList = characterList,
-            onClose = ::myExitApplication
+            onClose = ::exitApplication
         )
 
         defaultScope.launch {
@@ -780,83 +758,4 @@ fun main() = application {
             }
         }
     }
-}
-
-private fun loadSaveGame(): Gvas {
-    CharacterSaveFile.generateTempFolder() // Create temp folder Deletes old temp data
-
-    // Create backup folder
-    val file = File(Constants.BACKUP_PATH).absoluteFile
-    if (!file.exists()) {
-        file.mkdirs()
-    }
-
-    if (backup(auto = true)) {
-        Notifications.success("Automatically backed up your saved games")
-    } else {
-        Notifications.error("Something went wrong while backing up your saved games")
-    }
-
-    val gvas = Constants.HL_SAVE_GAMES_DIR?.let {
-        Gvas.read("$it\\SaveGameList.sav")
-    }
-
-    if (gvas == null) {
-        Notifications.error(
-            "Couldn't load saved game list. Please send me your error-logs.txt",
-            time = System.currentTimeMillis() + 5_000
-        )
-        throw RuntimeException("Couldn't load saved game list")
-    }
-
-    return gvas
-}
-
-private fun getCharacters(gvas: Gvas): List<Character> {
-    val saveGamesDirFile = Constants.HL_SAVE_GAMES_DIR?.let { File(it) }
-
-    if (saveGamesDirFile == null) {
-        Notifications.error(
-            "Couldn't load saved game list. Please send me your error-logs.txt",
-            time = System.currentTimeMillis() + 30_000
-        )
-        throw RuntimeException("Couldn't load saved game list")
-    }
-
-    val characters = mutableListOf<Character>()
-
-    val infoProperty = gvas.root["Info"] as StructProperty
-    val characterList = infoProperty["CharacterList"] as ArrayProperty
-    val saveFileList = infoProperty["SaveFileList"] as ArrayProperty
-
-    saveFileList.value
-        .mapNotNull {
-            val saveFileStruct = it as StructProperty
-            if ((saveFileStruct["bIsUsed"] as BoolProperty).value) {
-                val characterId = (saveFileStruct["CharacterID"] as IntProperty).value
-                val filename = (saveFileStruct["FilenameSlot"] as StrProperty).value
-                val saveTime = ((saveFileStruct["SaveTime"] as StructProperty)["Ticks"] as Int64Property).value
-                Triple(characterId, filename, saveTime)
-            } else {
-                null
-            }
-        }
-        .sortedByDescending { it.third } // Sort by Latest Save Time
-        .distinctBy { it.first } // Get latest save files for each character
-        .forEach { (characterId, filename, _) ->
-            characterList.value.forEach {
-                val id = Character.getId(it as StructProperty)
-                if (id == characterId) {
-                    val character = Character.from(
-                        it,
-                        CharacterSaveFile.read(File(saveGamesDirFile, "$filename.sav").absolutePath)
-                    )
-                    if (character.isUsed) {
-                        characters.add(character)
-                    }
-                }
-            }
-        }
-
-    return characters
 }

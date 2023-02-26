@@ -681,6 +681,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.jianastrero.hsle.enumerations.LoadablePageState
+import com.jianastrero.hsle.model.Character
 import com.jianastrero.hsle.model.Field
 import com.jianastrero.hsle.notification.Notifications
 import com.jianastrero.hsle.sqlite.SQLite
@@ -689,9 +690,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class FieldViewModel<T>(
-    private val sqlite: SQLite,
+    private val character: Character,
     list: List<Field<out T>>
 ) {
+    private val sqlite: SQLite
+        get() = character.saveFileData.sqlite
 
     private var _state by mutableStateOf(FieldState(list))
     val state: FieldState<T>
@@ -724,7 +727,6 @@ class FieldViewModel<T>(
     }
 
     suspend fun updateField(field: Field<out T>) = withContext(Dispatchers.Default) {
-        field.updateQuery()
         val newFields = state.fields.map {
             if (it.title == field.title) {
                 field
@@ -735,7 +737,23 @@ class FieldViewModel<T>(
         updateState(fields = newFields)
     }
 
-    suspend fun updateFieldSqlite(field: Field<out T>) = withContext(Dispatchers.IO) {
+    suspend fun updateFieldPersistently(field: Field<out T>) = withContext(Dispatchers.IO) {
         sqlite.updateField(field)
+
+        if (field is Field.PersonalDataField.FirstName || field is Field.PersonalDataField.LastName) {
+            var firstName: String? = null
+            var lastName: String? = null
+
+            state.fields.forEach { field ->
+                if (field is Field.PersonalDataField.FirstName) {
+                    firstName = field.value
+                }
+
+                if (field is Field.PersonalDataField.LastName) {
+                    lastName = field.value
+                }
+            }
+            character.withName("$firstName $lastName")
+        }
     }
 }

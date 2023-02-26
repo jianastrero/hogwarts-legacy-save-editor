@@ -675,221 +675,99 @@
  *
  */
 
-package com.jianastrero.hsle.screen
+package com.jianastrero.hsle.util
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowDropDown
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import com.jianastrero.gvas_tool.Gvas
-import com.jianastrero.hsle.component.HoverButton
-import com.jianastrero.hsle.component.NavHost
-import com.jianastrero.hsle.component.rememberNavController
-import com.jianastrero.hsle.enumerations.HouseCrest
-import com.jianastrero.hsle.icon.vector.ChevronRight
+import com.jianastrero.gvas_tool.model.property.ArrayProperty
+import com.jianastrero.gvas_tool.model.property.BoolProperty
+import com.jianastrero.gvas_tool.model.property.Int64Property
+import com.jianastrero.gvas_tool.model.property.IntProperty
+import com.jianastrero.gvas_tool.model.property.StrProperty
+import com.jianastrero.gvas_tool.model.property.StructProperty
+import com.jianastrero.hsle.Constants
 import com.jianastrero.hsle.model.Character
-import com.jianastrero.hsle.nav.HLSENav
-import com.jianastrero.hsle.nav.HLSENav.Main.Empty.sqlite
 import com.jianastrero.hsle.notification.Notifications
-import com.jianastrero.hsle.theme.BlueLight
-import com.jianastrero.hsle.theme.GreenLight
-import com.jianastrero.hsle.theme.Yellow
-import com.jianastrero.hsle.theme.YellowLight
-import com.jianastrero.hsle.util.backup
-import com.jianastrero.hsle.util.getCharacters
-import java.awt.Desktop
-import java.net.URI
+import com.jianastrero.hsle.save_file.CharacterSaveFile
+import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-@Composable
-fun MainScreen(
-    gvas: Gvas,
-    modifier: Modifier = Modifier
-) {
-    var characterList: List<Character> by remember { mutableStateOf(emptyList()) }
 
-    val navController = rememberNavController()
-    val bmcPainter = painterResource("bmc.svg")
-    var selectedCharacter: Character? by remember { mutableStateOf(null) }
+suspend fun loadSaveGame(): Gvas = withContext(Dispatchers.IO) {
+    CharacterSaveFile.generateTempFolder() // Create temp folder Deletes old temp data
 
-    Row(modifier = modifier) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxHeight()
-                .fillMaxWidth(0.3f)
-                .padding(horizontal = 12.dp)
-        ) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.weight(1f)
-                    .fillMaxWidth()
-            ) {
-                items(characterList) { character ->
-                    val houseCrest = HouseCrest.values()
-                        .first { it.value.lowercase() == character.house.lowercase() }
-                    val isSelected = selectedCharacter == character
+    // Create backup folder
+    val file = File(Constants.BACKUP_PATH).absoluteFile
+    if (!file.exists()) {
+        file.mkdirs()
+    }
 
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        HoverButton(
-                            text = character.toString(),
-                            onClick = { selectedCharacter = character },
-                            selected = isSelected,
-                            leadingIcon = houseCrest.imageVector,
-                            leadingIconTint = houseCrest.colorLight,
-                            trailingIcon = Icons.Rounded.ArrowDropDown,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        AnimatedVisibility(
-                            visible = isSelected,
-                            modifier = Modifier.align(Alignment.End)
-                        ) {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                HoverButton(
-                                    text = "Player Data",
-                                    onClick = {
-                                        navController.navigate(HLSENav.Main.PlayerData(sqlite))
-                                    },
-                                    selectedColor = GreenLight,
-                                    trailingIcon = Icons.Rounded.ChevronRight,
-                                    modifier = Modifier.fillMaxWidth(0.9f)
-                                )
-                                HoverButton(
-                                    text = "Resources",
-                                    onClick = {
-                                        navController.navigate(HLSENav.Main.Resources(sqlite))
-                                    },
-                                    selectedColor = GreenLight,
-                                    trailingIcon = Icons.Rounded.ChevronRight,
-                                    modifier = Modifier.fillMaxWidth(0.9f)
-                                )
-                            }
-                        }
-                    }
-                }
+    if (backup(auto = true)) {
+        Notifications.success("Automatically backed up your saved games")
+    } else {
+        Notifications.error("Something went wrong while backing up your saved games")
+    }
+
+    val gvas = Constants.HL_SAVE_GAMES_DIR?.let {
+        Gvas.read("$it\\SaveGameList.sav")
+    }
+
+    if (gvas == null) {
+        Notifications.error(
+            "Couldn't load saved game list. Please send me your error-logs.txt",
+            time = System.currentTimeMillis() + 5_000
+        )
+        throw RuntimeException("Couldn't load saved game list")
+    }
+
+    gvas
+}
+
+suspend fun getCharacters(gvas: Gvas): List<Character> = withContext(Dispatchers.IO) {
+    val saveGamesDirFile = Constants.HL_SAVE_GAMES_DIR?.let { File(it) }
+
+    if (saveGamesDirFile == null) {
+        Notifications.error(
+            "Couldn't load saved game list. Please send me your error-logs.txt",
+            time = System.currentTimeMillis() + 5_000
+        )
+        throw RuntimeException("Couldn't load saved game list")
+    }
+
+    val characters = mutableListOf<Character>()
+
+    val infoProperty = gvas.root["Info"] as StructProperty
+    val characterList = infoProperty["CharacterList"] as ArrayProperty
+    val saveFileList = infoProperty["SaveFileList"] as ArrayProperty
+
+    saveFileList.value
+        .mapNotNull {
+            val saveFileStruct = it as StructProperty
+            if ((saveFileStruct["bIsUsed"] as BoolProperty).value) {
+                val characterId = (saveFileStruct["CharacterID"] as IntProperty).value
+                val filename = (saveFileStruct["FilenameSlot"] as StrProperty).value
+                val saveTime = ((saveFileStruct["SaveTime"] as StructProperty)["Ticks"] as Int64Property).value
+                Triple(characterId, filename, saveTime)
+            } else {
+                null
             }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                HoverButton(
-                    text = "Backup",
-                    onClick = {
-                        if (backup(auto = false)) {
-                            Notifications.success("Backup saved on the backups folder")
-                        } else {
-                            Notifications.error("Something went wrong while backing up your saved games")
-                        }
-                    },
-                    hoveredColor = BlueLight,
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                HoverButton(
-                    text = "Save",
-                    onClick = {
-                        // TODO: Implement save
-                    },
-                    hoveredColor = YellowLight,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 12.dp)
-            ) {
-                Button(
-                    onClick = {
-                        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                            Desktop.getDesktop().browse(URI("https://www.buymeacoffee.com/jianastrero"))
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Yellow, contentColor = Color.Black),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Image(
-                        painter = bmcPainter,
-                        contentDescription = "Buy me a coffee",
-                        modifier = Modifier.width(100.dp)
+        }
+        .sortedByDescending { it.third } // Sort by Latest Save Time
+        .distinctBy { it.first } // Get the latest save files for each character
+        .forEach { (characterId, filename, _) ->
+            characterList.value.forEach {
+                val id = Character.getId(it as StructProperty)
+                if (id == characterId) {
+                    val character = Character.from(
+                        it,
+                        CharacterSaveFile.read(File(saveGamesDirFile, "$filename.sav").absolutePath)
                     )
+                    if (character.isUsed) {
+                        characters.add(character)
+                    }
                 }
             }
         }
-        NavHost(
-            startDestination = HLSENav.Main.Empty,
-            navController = navController,
-            modifier = Modifier.weight(1f)
-                .fillMaxHeight()
-        ) {
-            composable(HLSENav.Main.Empty::class) {
-                Spacer(modifier = Modifier)
-            }
-            composable(HLSENav.Main.PlayerData::class) {
-                selectedCharacter?.let { character ->
-                        PersonalDataScreen(
-                            character = character,
-                            modifier = Modifier.fillMaxSize()
-                                .padding(
-                                    start = 12.dp,
-                                    top = 12.dp,
-                                    bottom = 12.dp,
-                                    end = 24.dp
-                                )
-                        )
-                    }
-                    ?: kotlin.run {
-                        Notifications.error("Please don't delete your temp file nerd")
-                    }
-            }
-            composable(HLSENav.Main.Resources::class) {
-                selectedCharacter?.let { character ->
-                        ResourcesScreen(
-                            character = character,
-                            modifier = Modifier.fillMaxSize()
-                                .padding(
-                                    start = 12.dp,
-                                    top = 12.dp,
-                                    bottom = 12.dp,
-                                    end = 24.dp
-                                )
-                        )
-                    }
-                    ?: kotlin.run {
-                        Notifications.error("Please don't delete your temp file nerd")
-                    }
-            }
-        }
-    }
 
-    LaunchedEffect(gvas) {
-        if (gvas != Gvas.None) {
-            characterList = getCharacters(gvas)
-        }
-    }
+    characters
 }
