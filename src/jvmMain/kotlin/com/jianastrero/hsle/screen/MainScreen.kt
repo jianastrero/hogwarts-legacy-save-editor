@@ -738,6 +738,7 @@ fun MainScreen(
 
 
     fun updateSelectedCharacter(character: Character) {
+        println("<top>.updateSelectedCharacter -> character: $character")
         val newCharacterList = characterList.toMutableList()
         val index = newCharacterList.indexOfFirst { it.id == character.id }
         newCharacterList[index] = character

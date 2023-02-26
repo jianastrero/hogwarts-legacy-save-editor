@@ -677,6 +677,7 @@
 
 package com.jianastrero.hsle.sqlite
 
+import com.jianastrero.hsle.enumerations.Level
 import com.jianastrero.hsle.model.Field
 import java.sql.Connection
 import java.sql.DriverManager
@@ -704,6 +705,7 @@ open class SQLite(sqliteFilePath: String) {
                     is Long -> resultSet.getLong(it.valueColumn) ?: 0L
                     is Float -> resultSet.getFloat(it.valueColumn) ?: 0f
                     is Double -> resultSet.getDouble(it.valueColumn) ?: 0.0
+                    is Level -> Level.fromExp(resultSet.getInt(it.valueColumn))
                     else -> resultSet.getString(it.valueColumn) ?: ""
                 } as T
                 newFields.add(it.copy(value))

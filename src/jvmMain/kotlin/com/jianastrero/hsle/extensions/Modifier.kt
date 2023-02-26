@@ -675,92 +675,44 @@
  *
  */
 
-package com.jianastrero.hsle.viewmodel
+package com.jianastrero.hsle.extensions
 
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import com.jianastrero.hsle.enumerations.Level
-import com.jianastrero.hsle.enumerations.LoadablePageState
-import com.jianastrero.hsle.model.Character
-import com.jianastrero.hsle.model.Field
-import com.jianastrero.hsle.notification.Notifications
-import com.jianastrero.hsle.sqlite.SQLite
-import com.jianastrero.hsle.state.FieldState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.jianastrero.hsle.theme.Yellow
 
-class FieldViewModel<T>(
-    private val character: Character,
-    list: List<Field<out T>>
-) {
-    private val sqlite: SQLite
-        get() = character.saveFileData.sqlite
+@Composable
+fun Modifier.simpleVerticalScrollbar(
+    state: LazyListState,
+    width: Dp = 4.dp
+): Modifier {
 
-    private var _state by mutableStateOf(FieldState(list))
-    val state: FieldState<T>
-        get() = _state
+    return drawWithContent {
+        drawContent()
+        val firstVisibleElementIndex by derivedStateOf {
+            state.layoutInfo.visibleItemsInfo.firstOrNull()?.index ?: -1
+        }
 
-    private fun updateState(
-        fields: List<Field<out T>> = state.fields,
-        loadablePageState: LoadablePageState = state.loadablePageState
-    ) {
-        _state = _state.copy(
-            fields = fields,
-            loadablePageState = loadablePageState
-        )
-    }
+        if (firstVisibleElementIndex != -1) {
+            val elementHeight = this.size.height / state.layoutInfo.totalItemsCount
+            val scrollbarOffsetY = firstVisibleElementIndex * elementHeight
+            val scrollbarHeight = state.layoutInfo.visibleItemsInfo.size * elementHeight
 
-    suspend fun fetch() = withContext(Dispatchers.IO) {
-        try {
-            updateState(loadablePageState = LoadablePageState.Loading)
-
-            val fields = sqlite.fetchAll(state.fields)
-
-            updateState(
-                loadablePageState = LoadablePageState.Loaded,
-                fields = fields
+            drawRoundRect(
+                color = Yellow,
+                topLeft = Offset(this.size.width - width.toPx(), scrollbarOffsetY),
+                size = Size(width.toPx(), scrollbarHeight),
+                cornerRadius = CornerRadius(4f, 4f)
             )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Notifications.error(e.message ?: "Something went wrong")
         }
-    }
-
-    suspend fun updateField(field: Field<out T>) = withContext(Dispatchers.Default) {
-        val newFields = state.fields.map {
-            if (it.title == field.title) {
-                field
-            } else {
-                it
-            }
-        }
-        updateState(fields = newFields)
-    }
-
-    suspend fun updateFieldPersistently(field: Field<out T>): Character? = withContext(Dispatchers.IO) {
-        sqlite.updateField(field)
-
-        var firstName: String? = state.fields.firstOrNull { it is Field.PersonalDataField.FirstName }?.value as String?
-        var lastName: String? = state.fields.firstOrNull { it is Field.PersonalDataField.LastName }?.value as String?
-        var level: Level? = state.fields.firstOrNull { it is Field.PersonalDataField.Level }?.value as Level?
-
-        if (firstName == null || lastName == null || level == null) {
-            return@withContext null
-        }
-
-        if (field is Field.PersonalDataField.FirstName) {
-            firstName = field.value
-        }
-
-        if (field is Field.PersonalDataField.LastName) {
-            lastName = field.value
-        }
-
-        if (field is Field.PersonalDataField.Level) {
-            level = field.value
-        }
-
-        character.withName("$firstName $lastName").copy(level = level.ordinal + 1)
     }
 }

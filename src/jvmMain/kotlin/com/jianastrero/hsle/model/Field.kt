@@ -677,6 +677,8 @@
 
 package com.jianastrero.hsle.model
 
+import com.jianastrero.hsle.enumerations.Level as LevelEnum
+
 sealed class Field<T>(
     open val title: String,
     open val table: String,
@@ -690,7 +692,7 @@ sealed class Field<T>(
         return "SELECT $valueColumn FROM $table WHERE $whereClause"
     }
 
-    fun updateQuery(): String {
+    open fun updateQuery(): String {
         val whereClause = identifiers.joinToString(" AND ") { (column, value) -> "$column = \"$value\"" }
         return "UPDATE $table SET $valueColumn = \"$value\" WHERE $whereClause"
     }
@@ -698,12 +700,19 @@ sealed class Field<T>(
     fun <T> copy(newValue: T): Field<T> = when (this) {
         is PersonalDataField.FirstName -> PersonalDataField.FirstName(value = newValue as String)
         is PersonalDataField.LastName -> PersonalDataField.LastName(value = newValue as String)
-        is PersonalDataField.Experience -> PersonalDataField.Experience(value = newValue as Int)
+        is PersonalDataField.Level -> PersonalDataField.Level(value = newValue as LevelEnum)
         is PersonalDataField.Galleons -> PersonalDataField.Galleons(value = newValue as Int)
         is PersonalDataField.TalentPoints -> PersonalDataField.TalentPoints(value = newValue as Int)
         is PersonalDataField.House -> PersonalDataField.House(value = newValue as String)
         is ResourcesField -> copy(value = newValue as Int)
     } as Field<T>
+
+    override fun toString(): String = "Field(" +
+            "title = $title, " +
+            "table = $table, " +
+            "identifiers = [${identifiers.joinToString()}], " +
+            "valueColumn = $valueColumn, " +
+            "value = $value)"
 
     sealed class PersonalDataField<T>(
         title: String,
@@ -726,13 +735,18 @@ sealed class Field<T>(
             valueColumn = "DataValue",
             value = value
         )
-        class Experience(value: Int) : PersonalDataField<Int>(
-            title = "Experience",
+        class Level(value: LevelEnum) : PersonalDataField<LevelEnum>(
+            title = "Level",
             table = "MiscDataDynamic",
             identifiers = arrayOf("DataName" to "ExperiencePoints"),
             valueColumn = "DataValue",
             value = value
-        )
+        ) {
+            override fun updateQuery(): String {
+                val whereClause = identifiers.joinToString(" AND ") { (column, value) -> "$column = \"$value\"" }
+                return "UPDATE $table SET $valueColumn = \"${value.exp}\" WHERE $whereClause"
+            }
+        }
         class Galleons(value: Int) : PersonalDataField<Int>(
             title = "Galleons",
             table = "InventoryDynamic",

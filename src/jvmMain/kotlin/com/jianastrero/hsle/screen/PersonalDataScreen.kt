@@ -706,9 +706,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
+import com.jianastrero.hsle.component.DropDownFieldItem
 import com.jianastrero.hsle.component.LoadablePage
 import com.jianastrero.hsle.component.TextFieldFieldItem
 import com.jianastrero.hsle.enumerations.HouseCrest
+import com.jianastrero.hsle.enumerations.Level
 import com.jianastrero.hsle.model.Character
 import com.jianastrero.hsle.model.Field
 import com.jianastrero.hsle.viewmodel.FieldViewModel
@@ -728,7 +730,7 @@ fun PersonalDataScreen(
                 list = listOf(
                     Field.PersonalDataField.FirstName(""),
                     Field.PersonalDataField.LastName(""),
-                    Field.PersonalDataField.Experience(0),
+                    Field.PersonalDataField.Level(Level.Lvl1),
                     Field.PersonalDataField.Galleons(0),
                     Field.PersonalDataField.TalentPoints(0),
                     Field.PersonalDataField.House("")
@@ -747,21 +749,42 @@ fun PersonalDataScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = modifier
         ) {
-            items(viewModel.state.fields.filterNot { it is Field.PersonalDataField.House }) {
-                TextFieldFieldItem(
-                    it,
-                    onUpdate = {
-                        defaultScope.launch {
-                            viewModel.updateField(it)
-                        }
-                    },
-                    onUpdatesqlite = {
-                        ioScope.launch {
-                            viewModel.updateFieldPersistently(it)?.also(onCharacterUpdated)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
+            items(viewModel.state.fields.filterNot { it is Field.PersonalDataField.House }) {field ->
+                if (field is Field.PersonalDataField.Level) {
+                    DropDownFieldItem(
+                        label = field.title,
+                        values = Level.values().map { level ->
+                            "${level.name.replace("Lvl", "")} (exp: ${level.exp})"
+                        },
+                        selected = field.value.let { level ->
+                            "${level.name.replace("Lvl", "")} (exp: ${level.exp})"
+                        },
+                        onSelect = { newValue ->
+                            ioScope.launch {
+                                val lvl = newValue.split("\\s+".toRegex())[0].toInt()
+                                val newField = field.copy(Level.fromLevel(lvl))
+                                viewModel.updateFieldPersistently(newField)?.also(onCharacterUpdated)
+                                viewModel.updateField(newField)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    TextFieldFieldItem(
+                        field,
+                        onUpdate = {
+                            defaultScope.launch {
+                                viewModel.updateField(it)
+                            }
+                        },
+                        onUpdatesqlite = {
+                            ioScope.launch {
+                                viewModel.updateFieldPersistently(field)?.also(onCharacterUpdated)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
             item(
                 span = { GridItemSpan(2) }

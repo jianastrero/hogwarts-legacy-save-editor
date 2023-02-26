@@ -675,92 +675,53 @@
  *
  */
 
-package com.jianastrero.hsle.viewmodel
+package com.jianastrero.hsle.enumerations
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import com.jianastrero.hsle.enumerations.Level
-import com.jianastrero.hsle.enumerations.LoadablePageState
-import com.jianastrero.hsle.model.Character
-import com.jianastrero.hsle.model.Field
-import com.jianastrero.hsle.notification.Notifications
-import com.jianastrero.hsle.sqlite.SQLite
-import com.jianastrero.hsle.state.FieldState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+enum class Level(val exp: Int) {
+    Lvl1(0),
+    Lvl2(500),
+    Lvl3(1030),
+    Lvl4(1595),
+    Lvl5(2195),
+    Lvl6(2835),
+    Lvl7(3515),
+    Lvl8(4240),
+    Lvl9(5015),
+    Lvl10(5840),
+    Lvl11(6715),
+    Lvl12(7650),
+    Lvl13(8650),
+    Lvl14(9700),
+    Lvl15(10825),
+    Lvl16(12025),
+    Lvl17(13300),
+    Lvl18(14660),
+    Lvl19(16110),
+    Lvl20(17650),
+    Lvl21(19290),
+    Lvl22(21035),
+    Lvl23(22885),
+    Lvl24(24865),
+    Lvl25(26965),
+    Lvl26(29205),
+    Lvl27(31590),
+    Lvl28(34130),
+    Lvl29(36830),
+    Lvl30(39710),
+    Lvl31(42750),
+    Lvl32(46000),
+    Lvl33(49500),
+    Lvl34(53000),
+    Lvl35(56500),
+    Lvl36(60000),
+    Lvl37(63500),
+    Lvl38(67000),
+    Lvl39(70500),
+    Lvl40(74000);
 
-class FieldViewModel<T>(
-    private val character: Character,
-    list: List<Field<out T>>
-) {
-    private val sqlite: SQLite
-        get() = character.saveFileData.sqlite
+    companion object {
+        fun fromExp(exp: Int) = values().sortedByDescending { it.exp }.firstOrNull { it.exp <= exp } ?: Lvl1
 
-    private var _state by mutableStateOf(FieldState(list))
-    val state: FieldState<T>
-        get() = _state
-
-    private fun updateState(
-        fields: List<Field<out T>> = state.fields,
-        loadablePageState: LoadablePageState = state.loadablePageState
-    ) {
-        _state = _state.copy(
-            fields = fields,
-            loadablePageState = loadablePageState
-        )
-    }
-
-    suspend fun fetch() = withContext(Dispatchers.IO) {
-        try {
-            updateState(loadablePageState = LoadablePageState.Loading)
-
-            val fields = sqlite.fetchAll(state.fields)
-
-            updateState(
-                loadablePageState = LoadablePageState.Loaded,
-                fields = fields
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Notifications.error(e.message ?: "Something went wrong")
-        }
-    }
-
-    suspend fun updateField(field: Field<out T>) = withContext(Dispatchers.Default) {
-        val newFields = state.fields.map {
-            if (it.title == field.title) {
-                field
-            } else {
-                it
-            }
-        }
-        updateState(fields = newFields)
-    }
-
-    suspend fun updateFieldPersistently(field: Field<out T>): Character? = withContext(Dispatchers.IO) {
-        sqlite.updateField(field)
-
-        var firstName: String? = state.fields.firstOrNull { it is Field.PersonalDataField.FirstName }?.value as String?
-        var lastName: String? = state.fields.firstOrNull { it is Field.PersonalDataField.LastName }?.value as String?
-        var level: Level? = state.fields.firstOrNull { it is Field.PersonalDataField.Level }?.value as Level?
-
-        if (firstName == null || lastName == null || level == null) {
-            return@withContext null
-        }
-
-        if (field is Field.PersonalDataField.FirstName) {
-            firstName = field.value
-        }
-
-        if (field is Field.PersonalDataField.LastName) {
-            lastName = field.value
-        }
-
-        if (field is Field.PersonalDataField.Level) {
-            level = field.value
-        }
-
-        character.withName("$firstName $lastName").copy(level = level.ordinal + 1)
+        fun fromLevel(level: Int) = values().firstOrNull { it.name == "Lvl$level" } ?: Lvl1
     }
 }

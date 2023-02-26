@@ -675,92 +675,120 @@
  *
  */
 
-package com.jianastrero.hsle.viewmodel
+package com.jianastrero.hsle.component
 
+import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.jianastrero.hsle.enumerations.Level
-import com.jianastrero.hsle.enumerations.LoadablePageState
-import com.jianastrero.hsle.model.Character
-import com.jianastrero.hsle.model.Field
-import com.jianastrero.hsle.notification.Notifications
-import com.jianastrero.hsle.sqlite.SQLite
-import com.jianastrero.hsle.state.FieldState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toSize
+import com.jianastrero.hsle.theme.BlueGray
+import com.jianastrero.hsle.theme.HLSETheme
+import com.jianastrero.hsle.theme.Yellow
 
-class FieldViewModel<T>(
-    private val character: Character,
-    list: List<Field<out T>>
+@Composable
+fun DropDownFieldItem(
+    label: String,
+    values: List<String>,
+    selected: String,
+    onSelect: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    private val sqlite: SQLite
-        get() = character.saveFileData.sqlite
+    val focusManager = LocalFocusManager.current
+    var expanded by remember { mutableStateOf(false) }
+    var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
-    private var _state by mutableStateOf(FieldState(list))
-    val state: FieldState<T>
-        get() = _state
-
-    private fun updateState(
-        fields: List<Field<out T>> = state.fields,
-        loadablePageState: LoadablePageState = state.loadablePageState
-    ) {
-        _state = _state.copy(
-            fields = fields,
-            loadablePageState = loadablePageState
+    Box {
+        TextField(
+            value = selected,
+            onValueChange = {
+                // TODO: Value Changed
+            },
+            label = { Text(label) },
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.White,
+                backgroundColor = BlueGray.copy(alpha = 0.6f),
+                cursorColor = Color.White,
+                focusedLabelColor = Color.White.copy(alpha = 0.6f),
+                unfocusedLabelColor = Color.White.copy(alpha = 0.4f),
+                focusedIndicatorColor = Yellow,
+                unfocusedIndicatorColor = Yellow.copy(alpha = 0.3f)
+            ),
+            readOnly = true,
+            modifier = Modifier
+                .onFocusChanged {
+                    expanded = it.isFocused
+                }
+                .onGloballyPositioned { coordinates ->
+                    textFieldSize = coordinates.size.toSize()
+                }
+                .then(modifier)
         )
-    }
-
-    suspend fun fetch() = withContext(Dispatchers.IO) {
-        try {
-            updateState(loadablePageState = LoadablePageState.Loading)
-
-            val fields = sqlite.fetchAll(state.fields)
-
-            updateState(
-                loadablePageState = LoadablePageState.Loaded,
-                fields = fields
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Notifications.error(e.message ?: "Something went wrong")
-        }
-    }
-
-    suspend fun updateField(field: Field<out T>) = withContext(Dispatchers.Default) {
-        val newFields = state.fields.map {
-            if (it.title == field.title) {
-                field
-            } else {
-                it
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = {
+                focusManager.clearFocus(force = true)
+                expanded = false
+            },
+            modifier = Modifier.width(with(LocalDensity.current){textFieldSize.width.toDp()})
+                .background(BlueGray)
+        ) {
+            values.forEach { label ->
+                val isSelected = label == selected
+                Text(
+                    text = label,
+                    color = if (isSelected) Color.Black else Color.White,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                    fontSize = 18.sp,
+                    modifier = Modifier.background(if (isSelected) Yellow else BlueGray)
+                        .clickable {
+                            focusManager.clearFocus(true)
+                            expanded = false
+                            onSelect(label)
+                        }
+                        .fillMaxWidth()
+                        .padding(12.dp)
+                )
             }
         }
-        updateState(fields = newFields)
     }
+}
 
-    suspend fun updateFieldPersistently(field: Field<out T>): Character? = withContext(Dispatchers.IO) {
-        sqlite.updateField(field)
-
-        var firstName: String? = state.fields.firstOrNull { it is Field.PersonalDataField.FirstName }?.value as String?
-        var lastName: String? = state.fields.firstOrNull { it is Field.PersonalDataField.LastName }?.value as String?
-        var level: Level? = state.fields.firstOrNull { it is Field.PersonalDataField.Level }?.value as Level?
-
-        if (firstName == null || lastName == null || level == null) {
-            return@withContext null
+@Preview
+@Composable
+private fun DropDownFieldItemPreview() {
+    HLSETheme {
+        Column {
+            DropDownFieldItem(
+                label = "Level",
+                values = emptyList(),
+                selected = "1 (exp: 500)",
+                onSelect = {},
+                modifier = Modifier.fillMaxWidth()
+            )
         }
-
-        if (field is Field.PersonalDataField.FirstName) {
-            firstName = field.value
-        }
-
-        if (field is Field.PersonalDataField.LastName) {
-            lastName = field.value
-        }
-
-        if (field is Field.PersonalDataField.Level) {
-            level = field.value
-        }
-
-        character.withName("$firstName $lastName").copy(level = level.ordinal + 1)
     }
 }
