@@ -764,9 +764,15 @@ class NavHost(startDestination: HLSENav) {
 
     class NavController {
         private var onNavigate: (HLSENav) -> Unit = {}
+        private var _currentRoute: HLSENav? = null
+        val currentRoute: HLSENav?
+            get() = _currentRoute
 
         internal fun navHost(navHost: NavHost) {
-            onNavigate = { navHost.currentRoute = it }
+            onNavigate = {
+                navHost.currentRoute = it
+                _currentRoute = it
+            }
         }
 
         fun navigate(route: HLSENav) {

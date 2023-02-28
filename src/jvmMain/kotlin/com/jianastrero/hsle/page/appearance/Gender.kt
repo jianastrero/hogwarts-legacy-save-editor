@@ -675,269 +675,117 @@
  *
  */
 
-package com.jianastrero.hsle.screen
+package com.jianastrero.hsle.page.appearance
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.jianastrero.gvas_tool.Gvas
-import com.jianastrero.hsle.Constants
-import com.jianastrero.hsle.component.HoverButton
-import com.jianastrero.hsle.component.NavHost
-import com.jianastrero.hsle.component.rememberNavController
-import com.jianastrero.hsle.enumerations.HouseCrest
-import com.jianastrero.hsle.icon.vector.ChevronRight
-import com.jianastrero.hsle.model.Character
-import com.jianastrero.hsle.nav.HLSENav
-import com.jianastrero.hsle.nav.HLSENav.Main.Empty.sqlite
-import com.jianastrero.hsle.notification.Notifications
-import com.jianastrero.hsle.save_file.CharacterSaveFile
-import com.jianastrero.hsle.theme.BlueLight
-import com.jianastrero.hsle.theme.GreenLight
+import com.jianastrero.hl_assets.Gender
+import com.jianastrero.hl_assets.femalePainter
+import com.jianastrero.hl_assets.malePainter
 import com.jianastrero.hsle.theme.Yellow
-import com.jianastrero.hsle.theme.YellowLight
-import com.jianastrero.hsle.util.backup
-import com.jianastrero.hsle.util.updateCharacters
-import java.awt.Desktop
-import java.net.URI
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
-fun MainScreen(
-    gvas: Gvas,
-    characterList: List<Character>,
-    onCharacterListUpdated: (List<Character>) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val navController = rememberNavController()
-    val bmcPainter = painterResource("bmc.svg")
-    var selectedCharacter: Character? by remember { mutableStateOf(null) }
+fun Gender(modifier: Modifier = Modifier) {
+    var selected by remember { mutableStateOf("Male") }
 
-    val ioScope = rememberCoroutineScope { Dispatchers.IO }
+    Row(
+        modifier =
+        Modifier.clip(RoundedCornerShape(12.dp))
+            .then(modifier)
+    ) {
+        GenderItem(
+            gender = "Male",
+            painter = Gender.malePainter(),
+            isSelected = selected == "Male",
+            onClick = {
+                selected = "Male"
+            }
 
-
-    fun updateSelectedCharacter(character: Character) {
-        val newCharacterList = characterList.toMutableList()
-        val index = newCharacterList.indexOfFirst { it.id == character.id }
-        newCharacterList[index] = character
-        onCharacterListUpdated(newCharacterList)
-        selectedCharacter = character
+        )
+        GenderItem(
+            gender = "Female",
+            painter = Gender.femalePainter(),
+            isSelected = selected == "Female",
+            onClick = {
+                selected = "Female"
+            }
+        )
     }
+}
 
-
-    Row(modifier = modifier) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxHeight()
-                .fillMaxWidth(0.3f)
-                .padding(horizontal = 12.dp)
-        ) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.weight(1f)
-                    .fillMaxWidth()
-            ) {
-                items(characterList) { character ->
-                    val houseCrest = HouseCrest.values()
-                        .first { it.value.lowercase() == character.house.lowercase() }
-                    val isSelected = selectedCharacter == character
-
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        HoverButton(
-                            text = character.toString(),
-                            onClick = { selectedCharacter = character },
-                            selected = isSelected,
-                            leadingIcon = houseCrest.imageVector,
-                            leadingIconTint = houseCrest.colorLight,
-                            trailingIcon = Icons.Rounded.ArrowDropDown,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        AnimatedVisibility(
-                            visible = isSelected,
-                            modifier = Modifier.align(Alignment.End)
-                        ) {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                HoverButton(
-                                    text = "Player Data",
-                                    onClick = {
-                                        navController.navigate(HLSENav.Main.PlayerData(sqlite))
-                                    },
-                                    selectedColor = GreenLight,
-                                    trailingIcon = Icons.Rounded.ChevronRight,
-                                    modifier = Modifier.fillMaxWidth(0.9f)
-                                )
-                                HoverButton(
-                                    text = "Resources",
-                                    onClick = {
-                                        navController.navigate(HLSENav.Main.Resources(sqlite))
-                                    },
-                                    selectedColor = GreenLight,
-                                    trailingIcon = Icons.Rounded.ChevronRight,
-                                    modifier = Modifier.fillMaxWidth(0.9f)
-                                )
-                                HoverButton(
-                                    text = "Appearance",
-                                    onClick = {
-                                        navController.navigate(HLSENav.Main.Appearance(sqlite))
-                                    },
-                                    selectedColor = GreenLight,
-                                    trailingIcon = Icons.Rounded.ChevronRight,
-                                    modifier = Modifier.fillMaxWidth(0.9f)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                HoverButton(
-                    text = "Backup",
-                    onClick = {
-                        if (backup(auto = false)) {
-                            Notifications.success("Backup saved on the backups folder")
-                        } else {
-                            Notifications.error("Something went wrong while backing up your saved games")
-                        }
-                    },
-                    hoveredColor = BlueLight,
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                HoverButton(
-                    text = "Save",
-                    onClick = {
-                        ioScope.launch {
-                            Constants.HL_SAVE_GAMES_DIR?.let {
-                                updateCharacters(gvas, characterList)
-                                gvas.write("$it\\SaveGameList.sav")
-                                characterList.forEach { character ->
-                                    character.saveFiles.forEach { saveFileData ->
-                                        CharacterSaveFile.write(saveFileData)
-                                    }
-                                }
-                                Notifications.success("Successfully saved game files")
-                            } ?: Notifications.error("Something went wrong saving game files")
-                        }
-                    },
-                    hoveredColor = YellowLight,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 12.dp)
-            ) {
-                Button(
-                    onClick = {
-                        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                            Desktop.getDesktop().browse(URI("https://www.buymeacoffee.com/jianastrero"))
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Yellow, contentColor = Color.Black),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Image(
-                        painter = bmcPainter,
-                        contentDescription = "Buy me a coffee",
-                        modifier = Modifier.width(100.dp)
-                    )
-                }
-            }
+@Composable
+private fun RowScope.GenderItem(
+    gender: String,
+    painter: Painter,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    val backgroundColor by animateColorAsState(
+        if (isHovered) {
+            Color.Green.copy(0.01f)
+        } else if (isSelected) {
+            Yellow.copy(0.2f)
+        } else {
+            Color.Black.copy(0.2f)
         }
-        NavHost(
-            startDestination = HLSENav.Main.Empty,
-            navController = navController,
-            modifier = Modifier.weight(1f)
-                .fillMaxHeight()
-        ) {
-            composable(HLSENav.Main.Empty::class) {
-                Spacer(modifier = Modifier)
-            }
-            composable(HLSENav.Main.PlayerData::class) {
-                selectedCharacter?.let { character ->
-                    PersonalDataScreen(
-                        character = character,
-                        onCharacterUpdated = ::updateSelectedCharacter,
-                        modifier = Modifier.fillMaxSize()
-                            .padding(
-                                start = 12.dp,
-                                top = 12.dp,
-                                bottom = 12.dp,
-                                end = 24.dp
-                            )
-                    )
-                }
-                    ?: kotlin.run {
-                        Notifications.error("Please don't delete your temp file nerd")
-                    }
-            }
-            composable(HLSENav.Main.Resources::class) {
-                selectedCharacter?.let { character ->
-                    ResourcesScreen(
-                        character = character,
-                        modifier = Modifier.fillMaxSize()
-                            .padding(
-                                start = 12.dp,
-                                top = 12.dp,
-                                bottom = 12.dp,
-                                end = 24.dp
-                            )
-                    )
-                }
-                    ?: kotlin.run {
-                        Notifications.error("Please don't delete your temp file nerd")
-                    }
-            }
-            composable(HLSENav.Main.Appearance::class) {
-                selectedCharacter?.let { character ->
-                    AppearanceScreen(
-                        character = character,
-                        modifier = Modifier.fillMaxSize()
-                            .padding(
-                                start = 12.dp,
-                                top = 12.dp,
-                                bottom = 12.dp,
-                                end = 24.dp
-                            )
-                    )
-                }
-                    ?: kotlin.run {
-                        Notifications.error("Please don't delete your temp file nerd")
-                    }
-            }
-        }
+    )
+    val scale by animateFloatAsState(if (isHovered) 1.1f else 1f)
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxHeight()
+            .weight(1f)
+            .hoverable(interactionSource)
+            .background(backgroundColor)
+            .clickable(onClick = onClick)
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = gender,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxWidth(0.4f)
+                .aspectRatio(140f/278f)
+                .scale(scale)
+        )
+        Spacer(modifier = Modifier.height(12.dp * scale * 2))
+        Text(
+            text = gender,
+            color = if (isSelected) Yellow else Yellow.copy(0.4f),
+            style = MaterialTheme.typography.h6
+        )
     }
 }

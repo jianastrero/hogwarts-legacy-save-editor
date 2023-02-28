@@ -686,15 +686,16 @@ sealed interface HLSENav {
 
     sealed class Main(val title: String, val sqlite: SQLite) : HLSENav {
         object Empty : Main("Empty", SQLite.None)
-        class PlayerData(sqlite: SQLite) : Main(title, sqlite) {
-            companion object {
-                val title = "Player Data"
-            }
-        }
-        class Resources(sqlite: SQLite) : Main(title, sqlite) {
-            companion object {
-                val title = "Resources"
-            }
+        class PlayerData(sqlite: SQLite) : Main("Player Data", sqlite)
+        class Resources(sqlite: SQLite) : Main("Resources", sqlite)
+        class Appearance(sqlite: SQLite) : Main("Appearance", sqlite)
+    }
+    sealed class Appearance(val title: String) : HLSENav {
+        object Gender : Appearance("Gender")
+        object Face : Appearance("Face")
+
+        companion object {
+            fun values() = arrayOf(Gender, Face)
         }
     }
 }

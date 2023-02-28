@@ -677,267 +677,81 @@
 
 package com.jianastrero.hsle.screen
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.jianastrero.gvas_tool.Gvas
-import com.jianastrero.hsle.Constants
-import com.jianastrero.hsle.component.HoverButton
 import com.jianastrero.hsle.component.NavHost
+import com.jianastrero.hsle.component.PageTab
 import com.jianastrero.hsle.component.rememberNavController
-import com.jianastrero.hsle.enumerations.HouseCrest
-import com.jianastrero.hsle.icon.vector.ChevronRight
 import com.jianastrero.hsle.model.Character
+import com.jianastrero.hsle.model.Field
 import com.jianastrero.hsle.nav.HLSENav
-import com.jianastrero.hsle.nav.HLSENav.Main.Empty.sqlite
-import com.jianastrero.hsle.notification.Notifications
-import com.jianastrero.hsle.save_file.CharacterSaveFile
-import com.jianastrero.hsle.theme.BlueLight
-import com.jianastrero.hsle.theme.GreenLight
-import com.jianastrero.hsle.theme.Yellow
-import com.jianastrero.hsle.theme.YellowLight
-import com.jianastrero.hsle.util.backup
-import com.jianastrero.hsle.util.updateCharacters
-import java.awt.Desktop
-import java.net.URI
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.jianastrero.hsle.page.appearance.Face
+import com.jianastrero.hsle.page.appearance.Gender
+import com.jianastrero.hsle.theme.BlueGray
+import com.jianastrero.hsle.viewmodel.FieldViewModel
 
 @Composable
-fun MainScreen(
-    gvas: Gvas,
-    characterList: List<Character>,
-    onCharacterListUpdated: (List<Character>) -> Unit,
+fun AppearanceScreen(
+    character: Character,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
-    val bmcPainter = painterResource("bmc.svg")
-    var selectedCharacter: Character? by remember { mutableStateOf(null) }
-
-    val ioScope = rememberCoroutineScope { Dispatchers.IO }
-
-
-    fun updateSelectedCharacter(character: Character) {
-        val newCharacterList = characterList.toMutableList()
-        val index = newCharacterList.indexOfFirst { it.id == character.id }
-        newCharacterList[index] = character
-        onCharacterListUpdated(newCharacterList)
-        selectedCharacter = character
+    val viewModel by remember {
+        mutableStateOf(
+            FieldViewModel(
+                character = character,
+                list = Field.ResourcesField.values()
+            )
+        )
     }
 
-
-    Row(modifier = modifier) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxHeight()
-                .fillMaxWidth(0.3f)
-                .padding(horizontal = 12.dp)
+    Column(modifier = modifier) {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.weight(1f)
-                    .fillMaxWidth()
-            ) {
-                items(characterList) { character ->
-                    val houseCrest = HouseCrest.values()
-                        .first { it.value.lowercase() == character.house.lowercase() }
-                    val isSelected = selectedCharacter == character
-
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        HoverButton(
-                            text = character.toString(),
-                            onClick = { selectedCharacter = character },
-                            selected = isSelected,
-                            leadingIcon = houseCrest.imageVector,
-                            leadingIconTint = houseCrest.colorLight,
-                            trailingIcon = Icons.Rounded.ArrowDropDown,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        AnimatedVisibility(
-                            visible = isSelected,
-                            modifier = Modifier.align(Alignment.End)
-                        ) {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                HoverButton(
-                                    text = "Player Data",
-                                    onClick = {
-                                        navController.navigate(HLSENav.Main.PlayerData(sqlite))
-                                    },
-                                    selectedColor = GreenLight,
-                                    trailingIcon = Icons.Rounded.ChevronRight,
-                                    modifier = Modifier.fillMaxWidth(0.9f)
-                                )
-                                HoverButton(
-                                    text = "Resources",
-                                    onClick = {
-                                        navController.navigate(HLSENav.Main.Resources(sqlite))
-                                    },
-                                    selectedColor = GreenLight,
-                                    trailingIcon = Icons.Rounded.ChevronRight,
-                                    modifier = Modifier.fillMaxWidth(0.9f)
-                                )
-                                HoverButton(
-                                    text = "Appearance",
-                                    onClick = {
-                                        navController.navigate(HLSENav.Main.Appearance(sqlite))
-                                    },
-                                    selectedColor = GreenLight,
-                                    trailingIcon = Icons.Rounded.ChevronRight,
-                                    modifier = Modifier.fillMaxWidth(0.9f)
-                                )
-                            }
-                        }
+            items(HLSENav.Appearance.values()) {
+                PageTab(
+                    pageName = it.title,
+                    isSelected = navController.currentRoute == it,
+                    onClick = {
+                        navController.navigate(it)
                     }
-                }
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                HoverButton(
-                    text = "Backup",
-                    onClick = {
-                        if (backup(auto = false)) {
-                            Notifications.success("Backup saved on the backups folder")
-                        } else {
-                            Notifications.error("Something went wrong while backing up your saved games")
-                        }
-                    },
-                    hoveredColor = BlueLight,
-                    modifier = Modifier.weight(1f)
                 )
-                Spacer(modifier = Modifier.width(12.dp))
-                HoverButton(
-                    text = "Save",
-                    onClick = {
-                        ioScope.launch {
-                            Constants.HL_SAVE_GAMES_DIR?.let {
-                                updateCharacters(gvas, characterList)
-                                gvas.write("$it\\SaveGameList.sav")
-                                characterList.forEach { character ->
-                                    character.saveFiles.forEach { saveFileData ->
-                                        CharacterSaveFile.write(saveFileData)
-                                    }
-                                }
-                                Notifications.success("Successfully saved game files")
-                            } ?: Notifications.error("Something went wrong saving game files")
-                        }
-                    },
-                    hoveredColor = YellowLight,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 12.dp)
-            ) {
-                Button(
-                    onClick = {
-                        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                            Desktop.getDesktop().browse(URI("https://www.buymeacoffee.com/jianastrero"))
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Yellow, contentColor = Color.Black),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Image(
-                        painter = bmcPainter,
-                        contentDescription = "Buy me a coffee",
-                        modifier = Modifier.width(100.dp)
-                    )
-                }
             }
         }
         NavHost(
-            startDestination = HLSENav.Main.Empty,
+            startDestination = HLSENav.Appearance.Gender,
             navController = navController,
-            modifier = Modifier.weight(1f)
-                .fillMaxHeight()
+            modifier = Modifier.fillMaxWidth()
+                .weight(1f)
+                .background(BlueGray.copy(alpha = 0.6f), shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                .padding(12.dp)
         ) {
-            composable(HLSENav.Main.Empty::class) {
-                Spacer(modifier = Modifier)
+            composable(HLSENav.Appearance.Gender::class) {
+                Gender(modifier = Modifier.fillMaxSize())
             }
-            composable(HLSENav.Main.PlayerData::class) {
-                selectedCharacter?.let { character ->
-                    PersonalDataScreen(
-                        character = character,
-                        onCharacterUpdated = ::updateSelectedCharacter,
-                        modifier = Modifier.fillMaxSize()
-                            .padding(
-                                start = 12.dp,
-                                top = 12.dp,
-                                bottom = 12.dp,
-                                end = 24.dp
-                            )
-                    )
-                }
-                    ?: kotlin.run {
-                        Notifications.error("Please don't delete your temp file nerd")
-                    }
-            }
-            composable(HLSENav.Main.Resources::class) {
-                selectedCharacter?.let { character ->
-                    ResourcesScreen(
-                        character = character,
-                        modifier = Modifier.fillMaxSize()
-                            .padding(
-                                start = 12.dp,
-                                top = 12.dp,
-                                bottom = 12.dp,
-                                end = 24.dp
-                            )
-                    )
-                }
-                    ?: kotlin.run {
-                        Notifications.error("Please don't delete your temp file nerd")
-                    }
-            }
-            composable(HLSENav.Main.Appearance::class) {
-                selectedCharacter?.let { character ->
-                    AppearanceScreen(
-                        character = character,
-                        modifier = Modifier.fillMaxSize()
-                            .padding(
-                                start = 12.dp,
-                                top = 12.dp,
-                                bottom = 12.dp,
-                                end = 24.dp
-                            )
-                    )
-                }
-                    ?: kotlin.run {
-                        Notifications.error("Please don't delete your temp file nerd")
-                    }
+            composable(HLSENav.Appearance.Face::class) {
+                Face(modifier = Modifier.fillMaxSize())
             }
         }
+    }
+
+    LaunchedEffect(true)  {
+        viewModel.fetch()
     }
 }
