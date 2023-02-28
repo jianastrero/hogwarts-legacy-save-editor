@@ -677,11 +677,125 @@
 
 package com.jianastrero.hsle.page.appearance
 
-import androidx.compose.material.Text
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
+import com.jianastrero.hl_assets.Face
+import com.jianastrero.hsle.extensions.dashedBorder
+import com.jianastrero.hsle.theme.BlueGray
+import com.jianastrero.hsle.theme.Yellow
+import kotlin.random.Random
+
+private val random = Random(System.currentTimeMillis())
 
 @Composable
-fun Face(modifier: Modifier = Modifier) {
-    Text("Face")
+fun Face(
+    modifier: Modifier = Modifier
+) {
+    val selectedGender = "Male"
+    val faces by derivedStateOf { if (selectedGender == "Male") Face.Male.values() else Face.Female.values() }
+    var selectedFace: Face by remember { mutableStateOf(Face.Male.FaceMale001) }
+
+    Row(modifier = modifier) {
+        LazyVerticalGrid(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            columns = GridCells.Fixed(5),
+            modifier = Modifier.fillMaxHeight()
+                .weight(1f)
+        ) {
+            items(faces) {
+                FaceItem(
+                    painter = it.painter(),
+                    isSelected = selectedFace == it,
+                    onClick = {
+                        selectedFace = it
+                    }
+                )
+            }
+        }
+        Box(
+            modifier = Modifier.fillMaxHeight()
+                .weight(1f)
+        ) {
+            Image(
+                painter = selectedFace.painter(),
+                contentDescription = null,
+                contentScale = ContentScale.Inside,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Composable
+fun FaceItem(
+    painter: Painter,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    var lastIsHoveredValue by remember { mutableStateOf(false) }
+    val shape = RoundedCornerShape(12.dp)
+    val background by animateColorAsState(
+        if (isHovered || isSelected) Yellow.copy(0.4f) else BlueGray.copy(0.8f)
+    )
+    var borderOffsHover by remember { mutableStateOf(0.dp) }
+    val borderOffs by animateDpAsState(if (lastIsHoveredValue) borderOffsHover else 0.dp)
+
+    Box(
+        modifier = Modifier.fillMaxWidth()
+            .aspectRatio(1f/1.15f)
+            .clip(shape)
+            .background(background, shape)
+            .dashedBorder(4.dp, Yellow.copy(0.4f), shape, 32.dp, borderOffs)
+            .hoverable(interactionSource)
+            .clickable(onClick = onClick)
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = null,
+            contentScale = ContentScale.Inside,
+            modifier = Modifier.fillMaxWidth()
+                .wrapContentHeight()
+                .align(Alignment.BottomCenter)
+        )
+    }
+
+    LaunchedEffect(isHovered) {
+        if (isHovered != lastIsHoveredValue) {
+            lastIsHoveredValue = isHovered
+            borderOffsHover = random.nextInt(4, 64).dp
+        }
+    }
 }
