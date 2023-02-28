@@ -678,6 +678,8 @@
 package com.jianastrero.hsle.model
 
 import com.jianastrero.gvas_tool.extension.gvasByteArray
+import com.jianastrero.gvas_tool.extension.littleEndianByte
+import com.jianastrero.gvas_tool.model.property.ArrayProperty
 import com.jianastrero.gvas_tool.model.property.BoolProperty
 import com.jianastrero.gvas_tool.model.property.ByteProperty
 import com.jianastrero.gvas_tool.model.property.IntProperty
@@ -688,6 +690,7 @@ import com.jianastrero.hsle.enumerations.GameDifficulty
 data class Character(
     val id: Int,
     val name: String,
+    val nameBytes: ByteArray,
     val pronoun: String,
     val voice: String,
     val house: String,
@@ -698,8 +701,7 @@ data class Character(
 //    val clothesData: CharacterClothesData, Clothes ᕦ(ò_óˇ)ᕤ
     val isUsed: Boolean,
     val voicePitch: Int,
-    val saveFileData: CharacterSaveFileData,
-    val nameBytes: ByteArray = name.gvasByteArray()
+    val saveFiles: List<CharacterSaveFileData>
 ) {
 
     fun withName(name: String) = copy(
@@ -745,22 +747,46 @@ data class Character(
 
     override fun toString(): String = "$name - LVL $level"
 
+    fun updateStruct(structProperty: StructProperty) {
+        (structProperty["CharacterID"] as IntProperty).updateValue(id)
+        (structProperty["CharacterName"] as StrProperty).updateValue(name)
+        (structProperty["CharacterNameBytes"] as ArrayProperty).updateValue(
+            name.gvasByteArray().map { byte ->
+                ByteProperty().apply { value = byteArrayOf(byte) }
+            }.toMutableList()
+        )
+        (structProperty["CharacterPronoun"] as StrProperty).updateValue(pronoun)
+        (structProperty["CharacterVoice"] as StrProperty).updateValue(voice)
+        (structProperty["CharacterHouse"] as StrProperty).updateValue(house)
+        (structProperty["CharacterGender"] as StrProperty).updateValue(gender)
+        (structProperty["CharacterLevel"] as IntProperty).updateValue(level)
+        (structProperty["CharacterGameDifficulty"] as ByteProperty).updateValue(gameDifficulty.ordinal.toByte().littleEndianByte())
+        (structProperty["bIsUsed"] as BoolProperty).updateValue(isUsed)
+        (structProperty["VoicePitch"] as IntProperty).updateValue(voicePitch)
+        (structProperty["VoicePitch"] as IntProperty).updateValue(voicePitch)
+    }
+
     companion object {
 
         fun getId(property: StructProperty) = (property["CharacterID"] as IntProperty).value
 
-        fun from(property: StructProperty, characterSaveFileData: CharacterSaveFileData) = Character(
+        fun from(property: StructProperty, saveFiles: List<CharacterSaveFileData>) = Character(
             id = (property["CharacterID"] as IntProperty).value,
             name = (property["CharacterName"] as StrProperty).value,
+            nameBytes = ((property["CharacterNameBytes"] as ArrayProperty).value as List<ByteProperty>)
+                .map { it.value.littleEndianByte() }
+                .toByteArray(),
             pronoun = (property["CharacterPronoun"] as StrProperty).value,
             voice = (property["CharacterVoice"] as StrProperty).value,
             house = (property["CharacterHouse"] as StrProperty).value,
             gender = (property["CharacterGender"] as StrProperty).value,
             level = (property["CharacterLevel"] as IntProperty).value,
-            gameDifficulty = GameDifficulty.fromOrdinal((property["CharacterGameDifficulty"] as ByteProperty).textPayload?.toInt() ?: -1),
+            gameDifficulty = GameDifficulty.fromOrdinal(
+                (property["CharacterGameDifficulty"] as ByteProperty).value.littleEndianByte().toInt()
+            ),
             isUsed = (property["bIsUsed"] as BoolProperty).value,
             voicePitch = (property["VoicePitch"] as IntProperty).value,
-            saveFileData = characterSaveFileData
+            saveFiles = saveFiles
         )
 
     }

@@ -696,10 +696,10 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -707,6 +707,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.jianastrero.gvas_tool.Gvas
+import com.jianastrero.hsle.Constants
 import com.jianastrero.hsle.component.HoverButton
 import com.jianastrero.hsle.component.NavHost
 import com.jianastrero.hsle.component.rememberNavController
@@ -716,33 +717,37 @@ import com.jianastrero.hsle.model.Character
 import com.jianastrero.hsle.nav.HLSENav
 import com.jianastrero.hsle.nav.HLSENav.Main.Empty.sqlite
 import com.jianastrero.hsle.notification.Notifications
+import com.jianastrero.hsle.save_file.CharacterSaveFile
 import com.jianastrero.hsle.theme.BlueLight
 import com.jianastrero.hsle.theme.GreenLight
 import com.jianastrero.hsle.theme.Yellow
 import com.jianastrero.hsle.theme.YellowLight
 import com.jianastrero.hsle.util.backup
-import com.jianastrero.hsle.util.getCharacters
+import com.jianastrero.hsle.util.updateCharacters
 import java.awt.Desktop
 import java.net.URI
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
     gvas: Gvas,
+    characterList: List<Character>,
+    onCharacterListUpdated: (List<Character>) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var characterList: List<Character> by remember { mutableStateOf(emptyList()) }
-
     val navController = rememberNavController()
     val bmcPainter = painterResource("bmc.svg")
     var selectedCharacter: Character? by remember { mutableStateOf(null) }
 
+    val ioScope = rememberCoroutineScope { Dispatchers.IO }
+
 
     fun updateSelectedCharacter(character: Character) {
-        println("<top>.updateSelectedCharacter -> character: $character")
         val newCharacterList = characterList.toMutableList()
         val index = newCharacterList.indexOfFirst { it.id == character.id }
         newCharacterList[index] = character
-        characterList = newCharacterList
+        onCharacterListUpdated(newCharacterList)
         selectedCharacter = character
     }
 
@@ -823,7 +828,18 @@ fun MainScreen(
                 HoverButton(
                     text = "Save",
                     onClick = {
-                        // TODO: Implement save
+                        ioScope.launch {
+                            Constants.HL_SAVE_GAMES_DIR?.let {
+                                updateCharacters(gvas, characterList)
+                                gvas.write("$it\\SaveGameList.sav")
+                                characterList.forEach { character ->
+                                    character.saveFiles.forEach { saveFileData ->
+                                        CharacterSaveFile.write(saveFileData)
+                                    }
+                                }
+                                Notifications.success("Successfully saved game files")
+                            } ?: Notifications.error("Something went wrong saving game files")
+                        }
                     },
                     hoveredColor = YellowLight,
                     modifier = Modifier.weight(1f)
@@ -896,12 +912,6 @@ fun MainScreen(
                         Notifications.error("Please don't delete your temp file nerd")
                     }
             }
-        }
-    }
-
-    LaunchedEffect(gvas) {
-        if (gvas != Gvas.None) {
-            characterList = getCharacters(gvas)
         }
     }
 }

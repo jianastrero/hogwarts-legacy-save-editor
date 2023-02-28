@@ -722,12 +722,14 @@ import com.jianastrero.gvas_tool.Gvas
 import com.jianastrero.hsle.component.NavHost
 import com.jianastrero.hsle.component.NotificationItem
 import com.jianastrero.hsle.component.rememberNavController
+import com.jianastrero.hsle.model.Character
 import com.jianastrero.hsle.nav.HLSENav
 import com.jianastrero.hsle.notification.Notifications
 import com.jianastrero.hsle.screen.InitialScreen
 import com.jianastrero.hsle.screen.MainScreen
 import com.jianastrero.hsle.theme.HLSETheme
 import com.jianastrero.hsle.theme.Red
+import com.jianastrero.hsle.util.getCharacters
 import com.jianastrero.hsle.util.loadSaveGame
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -735,6 +737,7 @@ import com.jianastrero.hsle.util.loadSaveGame
 @Preview
 fun App(onClose: () -> Unit) {
     var gvas by remember { mutableStateOf(Gvas.None) }
+    var characterList by remember { mutableStateOf(emptyList<Character>()) }
 
     val backgroundPainter = painterResource("background.jpg")
     val titlePainter = painterResource("title.png")
@@ -791,6 +794,10 @@ fun App(onClose: () -> Unit) {
                     composable(HLSENav.MainScreen::class) {
                         MainScreen(
                             gvas = gvas,
+                            characterList = characterList,
+                            onCharacterListUpdated = {
+                                characterList = it
+                            },
                             modifier = Modifier.fillMaxSize()
                         )
                     }
@@ -819,9 +826,10 @@ fun App(onClose: () -> Unit) {
         }
     }
 
-    LaunchedEffect(gvas) {
+    LaunchedEffect(true) {
         if (gvas == Gvas.None) {
             gvas = loadSaveGame()
+            characterList = getCharacters(gvas)
             navController.navigate(HLSENav.MainScreen)
         }
     }

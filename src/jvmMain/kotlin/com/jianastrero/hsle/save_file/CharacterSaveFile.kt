@@ -677,8 +677,8 @@
 
 package com.jianastrero.hsle.save_file
 
-import com.jianastrero.hsle.extensions.findFirst
-import com.jianastrero.hsle.extensions.littleEndian
+import com.jianastrero.gvas_tool.extension.findFirst
+import com.jianastrero.gvas_tool.extension.littleEndianInt
 import com.jianastrero.hsle.model.CharacterSaveFileData
 import com.jianastrero.hsle.sqlite.SQLite
 import java.io.File
@@ -703,7 +703,7 @@ object CharacterSaveFile {
         val dbSizeOffset = rawDbImageStartIndex + 61
         val dbStartOffset = dbSizeOffset + 4
         val dbSizeBytes = bytes.copyOfRange(dbSizeOffset, dbStartOffset)
-        val dbSize = dbSizeBytes.littleEndian()
+        val dbSize = dbSizeBytes.littleEndianInt()
         val dbEndOffset = dbStartOffset + dbSize
 
         val tempSqliteFilePath = "$TEMP_FOLDER${File.separatorChar}temp-${System.currentTimeMillis()}.sqlite"
@@ -714,6 +714,7 @@ object CharacterSaveFile {
         }
 
         CharacterSaveFileData(
+            filePath = filePath,
             tempSqliteFilePath = tempSqliteFile.absolutePath,
             saveFileBytes = bytes,
             rawDbImageStartIndex = rawDbImageStartIndex,
@@ -722,18 +723,15 @@ object CharacterSaveFile {
         )
     }
 
-    suspend fun write(
-        filePath: String,
-        characterSaveFileData: CharacterSaveFileData
-    ): Unit = withContext(Dispatchers.IO) {
+    suspend fun write(characterSaveFileData: CharacterSaveFileData): Unit = withContext(Dispatchers.IO) {
         val tempSqliteBytes = File(characterSaveFileData.tempSqliteFilePath).readBytes()
-        val newSaveFile = File(filePath)
+        val newSaveFile = File(characterSaveFileData.filePath)
         newSaveFile.outputStream().use {
             // Put original save file initial padding
             it.write(characterSaveFileData.saveFileBytes.copyOfRange(0, characterSaveFileData.rawDbImageStartIndex + 35))
 
             // Write sqlite size + 4 in little endian
-            it.write((tempSqliteBytes.size + 4).littleEndian())
+            it.write((tempSqliteBytes.size + 4).littleEndianInt())
 
             // Write padding bytes from original file
             it.write(
@@ -742,7 +740,7 @@ object CharacterSaveFile {
             )
 
             // Write sqlite size in little endian
-            it.write(tempSqliteBytes.size.littleEndian())
+            it.write(tempSqliteBytes.size.littleEndianInt())
 
             // Write updated db
             it.write(tempSqliteBytes)

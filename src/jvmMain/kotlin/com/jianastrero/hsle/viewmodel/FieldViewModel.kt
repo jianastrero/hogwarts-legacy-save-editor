@@ -695,7 +695,7 @@ class FieldViewModel<T>(
     list: List<Field<out T>>
 ) {
     private val sqlite: SQLite
-        get() = character.saveFileData.sqlite
+        get() = character.saveFiles.first().sqlite
 
     private var _state by mutableStateOf(FieldState(list))
     val state: FieldState<T>
@@ -739,7 +739,9 @@ class FieldViewModel<T>(
     }
 
     suspend fun updateFieldPersistently(field: Field<out T>): Character? = withContext(Dispatchers.IO) {
-        sqlite.updateField(field)
+        character.saveFiles.forEach {
+            it.sqlite.updateField(field)
+        }
 
         var firstName: String? = state.fields.firstOrNull { it is Field.PersonalDataField.FirstName }?.value as String?
         var lastName: String? = state.fields.firstOrNull { it is Field.PersonalDataField.LastName }?.value as String?

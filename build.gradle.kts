@@ -26,6 +26,8 @@ kotlin {
 
                 implementation("org.xerial:sqlite-jdbc:3.40.1.0")
 
+                implementation("com.google.code.gson:gson:2.10.1")
+
                 implementation(project(mapOf("path" to ":gvas-tool")))
             }
         }

@@ -753,15 +753,15 @@ suspend fun getCharacters(gvas: Gvas): List<Character> = withContext(Dispatchers
             }
         }
         .sortedByDescending { it.third } // Sort by Latest Save Time
-        .distinctBy { it.first } // Get the latest save files for each character
-        .forEach { (characterId, filename, _) ->
+        .groupBy { it.first }
+        .forEach { (id, saveFilesTriple) ->
+            val saveFiles = saveFilesTriple.map { (_, filename, _) ->
+                CharacterSaveFile.read(File(saveGamesDirFile, "${filename}.sav").absolutePath)
+            }
             characterList.value.forEach {
-                val id = Character.getId(it as StructProperty)
+                val characterId = Character.getId(it as StructProperty)
                 if (id == characterId) {
-                    val character = Character.from(
-                        it,
-                        CharacterSaveFile.read(File(saveGamesDirFile, "$filename.sav").absolutePath)
-                    )
+                    val character = Character.from(it, saveFiles)
                     if (character.isUsed) {
                         characters.add(character)
                     }
@@ -770,4 +770,21 @@ suspend fun getCharacters(gvas: Gvas): List<Character> = withContext(Dispatchers
         }
 
     characters
+}
+
+fun updateCharacters(gvas: Gvas, characters: List<Character>) {
+    val infoProperty = gvas.root["Info"] as StructProperty
+    val characterList = infoProperty["CharacterList"] as ArrayProperty
+    val saveFileList = infoProperty["SaveFileList"] as ArrayProperty
+
+    infoProperty.remove("LastLoadedCharacter")
+    infoProperty.remove("CurrentCharacter")
+
+    (infoProperty["CharacterList"] as ArrayProperty).value = characterList.value.map {
+        val characterStruct = it as StructProperty
+        val id = Character.getId(characterStruct)
+        characters.firstOrNull { it.id == id }?.updateStruct(characterStruct)
+        it
+    }.toMutableList()
+    gvas.root["Info"] = infoProperty
 }
