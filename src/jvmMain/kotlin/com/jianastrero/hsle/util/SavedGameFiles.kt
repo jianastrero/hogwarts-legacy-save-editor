@@ -775,10 +775,9 @@ suspend fun getCharacters(gvas: Gvas): List<Character> = withContext(Dispatchers
 fun updateCharacters(gvas: Gvas, characters: List<Character>) {
     val infoProperty = gvas.root["Info"] as StructProperty
     val characterList = infoProperty["CharacterList"] as ArrayProperty
-    val saveFileList = infoProperty["SaveFileList"] as ArrayProperty
 
-    infoProperty.remove("LastLoadedCharacter")
-    infoProperty.remove("CurrentCharacter")
+//    infoProperty.remove("LastLoadedCharacter")
+//    infoProperty.remove("CurrentCharacter")
 
     (infoProperty["CharacterList"] as ArrayProperty).value = characterList.value.map {
         val characterStruct = it as StructProperty
