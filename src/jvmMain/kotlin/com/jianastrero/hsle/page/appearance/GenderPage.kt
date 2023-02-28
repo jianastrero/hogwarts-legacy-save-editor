@@ -711,36 +711,28 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.jianastrero.hl_assets.Gender
-import com.jianastrero.hl_assets.femalePainter
-import com.jianastrero.hl_assets.malePainter
 import com.jianastrero.hsle.theme.Yellow
 
 @Composable
 fun Gender(modifier: Modifier = Modifier) {
-    var selected by remember { mutableStateOf("Male") }
+    var selected: Gender by remember { mutableStateOf(Gender.Male) }
 
     Row(
         modifier =
         Modifier.clip(RoundedCornerShape(12.dp))
             .then(modifier)
     ) {
-        GenderItem(
-            gender = "Male",
-            painter = Gender.malePainter(),
-            isSelected = selected == "Male",
-            onClick = {
-                selected = "Male"
-            }
+        Gender.values().forEach {
+            GenderItem(
+                gender = it.toString(),
+                painter = it.painter(),
+                isSelected = selected == it,
+                onClick = {
+                    selected = it
+                }
 
-        )
-        GenderItem(
-            gender = "Female",
-            painter = Gender.femalePainter(),
-            isSelected = selected == "Female",
-            onClick = {
-                selected = "Female"
-            }
-        )
+            )
+        }
     }
 }
 
