@@ -1,3 +1,6 @@
 [submodule "gvas-tool"]
 	path = gvas-tool
 	url = git@github.com:jianastrero/gvas-tool.git
+[submodule "hogwarts-legacy-assets"]
+	path = hogwarts-legacy-assets
+	url = git@github.com:jianastrero/hogwarts-legacy-assets.git
