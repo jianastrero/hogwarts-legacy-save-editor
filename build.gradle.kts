@@ -29,6 +29,7 @@ kotlin {
                 implementation("com.google.code.gson:gson:2.10.1")
 
                 implementation(project(mapOf("path" to ":gvas-tool")))
+                implementation(project(mapOf("path" to ":hogwarts-legacy-assets")))
             }
         }
         val jvmTest by getting
