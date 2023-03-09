@@ -678,7 +678,7 @@
 package com.jianastrero.hsle.model
 
 import com.jianastrero.gvas_tool.extension.gvasByteArray
-import com.jianastrero.gvas_tool.extension.littleEndianByte
+import com.jianastrero.gvas_tool.extension.toByte
 import com.jianastrero.gvas_tool.model.property.ArrayProperty
 import com.jianastrero.gvas_tool.model.property.BoolProperty
 import com.jianastrero.gvas_tool.model.property.ByteProperty
@@ -760,7 +760,7 @@ data class Character(
         (structProperty["CharacterHouse"] as StrProperty).updateValue(house)
         (structProperty["CharacterGender"] as StrProperty).updateValue(gender)
         (structProperty["CharacterLevel"] as IntProperty).updateValue(level)
-        (structProperty["CharacterGameDifficulty"] as ByteProperty).updateValue(gameDifficulty.ordinal.toByte().littleEndianByte())
+        (structProperty["CharacterGameDifficulty"] as ByteProperty).updateValue(byteArrayOf(gameDifficulty.ordinal.toByte()))
         (structProperty["bIsUsed"] as BoolProperty).updateValue(isUsed)
         (structProperty["VoicePitch"] as IntProperty).updateValue(voicePitch)
         (structProperty["VoicePitch"] as IntProperty).updateValue(voicePitch)
@@ -774,7 +774,7 @@ data class Character(
             id = (property["CharacterID"] as IntProperty).value,
             name = (property["CharacterName"] as StrProperty).value,
             nameBytes = ((property["CharacterNameBytes"] as ArrayProperty).value as List<ByteProperty>)
-                .map { it.value.littleEndianByte() }
+                .map { it.value.toByte() }
                 .toByteArray(),
             pronoun = (property["CharacterPronoun"] as StrProperty).value,
             voice = (property["CharacterVoice"] as StrProperty).value,
@@ -782,7 +782,7 @@ data class Character(
             gender = (property["CharacterGender"] as StrProperty).value,
             level = (property["CharacterLevel"] as IntProperty).value,
             gameDifficulty = GameDifficulty.fromOrdinal(
-                (property["CharacterGameDifficulty"] as ByteProperty).value.littleEndianByte().toInt()
+                (property["CharacterGameDifficulty"] as ByteProperty).value[0].toInt()
             ),
             isUsed = (property["bIsUsed"] as BoolProperty).value,
             voicePitch = (property["VoicePitch"] as IntProperty).value,
